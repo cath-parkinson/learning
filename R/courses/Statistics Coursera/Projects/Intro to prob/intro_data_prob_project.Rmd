@@ -1,0 +1,287 @@
+---
+title: "Exploring the BRFSS data"
+output: 
+  html_document: 
+    fig_height: 4
+    highlight: pygments
+    theme: spacelab
+---
+
+## Setup
+
+### Load packages
+
+```{r load-packages, message = FALSE, warning = FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(scales)
+library(forcats) 
+#set theme
+theme_set(theme_light())
+```
+
+### Load data
+
+```{r load-data}
+load("brfss2013.RData")
+```
+
+
+
+* * *
+
+## Part 1: Data
+
+The BRFSS is a continuous, cross sectional survey focused on health. It is conducted annually across all states in America, as well some participating US territories. 
+
+Data collection is handled by each area separately. Areas must follow the BRFSS protocols, but may opt to contract a private company, university or conduct the interviews internally themselves. Care is taken with the interview schedule, designed to ensure a representative sample. For example, there is a 20% limit on the number of weekday interviews that can be collected, and the schedule is altered to accommodate National holidays, and special events. 
+
+Surveys within each area are conducted via telephone, with two samples: 80% landline and 20% cellular, each with their own sampling design. Many areas design these samples within sub-state geographical regions such as county or public health district. The landline sample structure is designed using a disproportionate stratified sample (DSS). The sample is divided into 2 groups - the first with a high proportion of target numbers, the second with a low proportion of target numbers. A 1:1.5 landline sampling ratio is applied, which results in a more efficient sampling method than simple random sampling. The cellular sample is randomly generated from a sample frame of confirmed geographical codes. Each area conducts 4000 interviews a year. A random sample of 5% of interviews are called back to verify data quality. 
+
+The data is weighted, to account for any bias resulting from the sampling method. Design weighting takes into account the number of phones and adults within each household. While iterative proportional weighting is used to ensure the sample is representative by several demographic characteristics including sex, age, race, education, marital status, home ownership, phone ownership (landline telephone, cellular telephone or both) and sub-state region. Note, in this particular data exploration, we will use unweighted data for simplicity.
+
+The BRFSS is an observational study, using random sampling. That means we can generalise our conclusions to the population of American adults. However random assignment is not used, so although we can observe interesting relationships between different factors, and hypothesise what they might mean - we will not be able to prove causation (whether or not one factor drives another).
+
+* * *
+
+## Part 2: Research questions
+
+This exploratory analysis of the BRFSS data set will focus on the physical and mental health of the US population, and seek to answer the following questions:
+
+**Research question 1:** What is the average number of reported unwell days for physical and mental health?
+
+**Research question 2:** Is there a relationship between demographic grouping and number of reported unwell days?
+
+**Research question 3:** Is there an association between reported unwell days for mental and physical health?
+
+* * *
+
+## Part 3: Exploratory data analysis
+
+**Research question 1:** What is the average number of reported unwell days for physical and mental health?
+
+In the BRFSS study, respondents were asked to record the number of days in the past 30 when their health was not good. They answered about physical and mental health separately. We'll use these two metrics to explore the health of the US population, focusing on the average number of unwell days, and looking at how physical and mental health compare. 
+
+Before getting into the analysis, we'll first filter the dataset to focus on the population we're interested in and clean the data to remove those who chose not to answer the questions of interest.
+
+```{r}
+
+#filter data to focus on 2013, and US states only
+brfss2013 <- brfss2013 %>% filter(as.numeric(X_state) < 53 & as.numeric(X_state) > 1 & iyear == "2013") 
+
+#filter data by the variables needed, and tidy up data labels
+brfss2013 <- brfss2013 %>% select(Physical = physhlth, Mental = menthlth, Gender = sex, Age = X_age_g) %>% mutate(Age = fct_recode(Age, "18 to 24" = "Age 18 to 24", "25 to 34" = "Age 25 to 34", "35 to 44" = "Age 35 to 44", "45 to 54" = "Age 45 to 54", "55 to 64" = "Age 55 to 64", "65 or older" = "Age 65 or older"))
+
+#clean the data by removing NAs (respondents who declined to answer these questions)
+brfss2013 <- brfss2013[complete.cases(brfss2013[ , -3]), ]
+
+```
+
+Figure 1 shows the distribution of the two variables we are interested in - the number of days physically unwell, and number of days mentally unwell. Both variables show a prominent spike at zero days, representing the majority of respondents who reported zero unwell days in the last 30. Above zero, the data drops off steeply, and has a long right skew up to 10 days. There is a spike at 30 days which may represent a minority of the population suffering from longer term health issues.
+
+```{r}
+
+#filter data set by key variables of interest
+D1 <- brfss2013 %>% select(Physical, Mental) %>% gather(Health, Days, c(Physical, Mental))
+labels <- c(Physical = "Physically unwell", Mental = "Mentally unwell")
+D1$Health <- factor(D1$Health, levels = c("Physical", "Mental"))
+
+#plot distribution of key variables
+ggplot(data=D1, aes(x=Days)) + geom_histogram(binwidth = 1) + 
+  facet_grid(Health~. , labeller = labeller(Health = labels)) + 
+  ggtitle("Figure 1: Distribution of days unwell (in the last 30)") + ylab("Frequency") + scale_y_continuous(labels = comma)
+
+```
+
+Figure 2 shows summary statistics for the number of physical and mental unwell days. The mean number of days unwell is higher for physical than mental health. The standard deviation and interquartile range show that there is also greater variation in the number of physically unwell days, compared with mental health. The median is zero in both cases as over half the sample report zero unwell days. 
+
+```{r}
+#output summary statistics
+F2 <- D1 %>%  select(Health, Days) %>% group_by(Health) %>% 
+  summarise(Mean = round(mean(Days), 1), 'Standard deviation' = round(sd(Days),1), Median = round(median(Days),1), IQR = IQR(Days)) %>%
+  arrange(desc(Mean))
+kable(F2, caption = "Figure 2: Number of days unwell (statistics)", padding = 0)
+
+
+```
+
+We'll explore this further by grouping our numeric variables into bands: 0 days unwell, 1-9 days unwell, and 10+ days unwell. 
+
+```{r}
+
+#group numeric data into bands
+brfss2013 <- brfss2013 %>% 
+  mutate(ph.band = cut(Physical, breaks = c(0,1,10,31), labels = c("0", "1-9", "10+"), right=FALSE)) %>% 
+  mutate(me.band = cut(Mental, breaks = c(0,1,10,31), labels = c("0", "1-9", "10+"), right=FALSE)) %>% 
+  mutate(ph.band2 = cut(Physical, breaks = c(0,1,31), labels = c("0", "1+"), right=FALSE)) %>% 
+  mutate(me.band2 = cut(Mental, breaks = c(0,1,31), labels = c("0", "1+"), right=FALSE))
+
+```
+
+Figure 3 shows the proportion of the sample who reported zero unwell days, 1-9 unwell days, and 10+ unwell days in the last 30. While the majority had zero days, the number who reported at least 1 day unwell is not insignificant, with more respondents reporting physically unwell days than mentally unwell. This could suggest that physical unwellness is more prevalent than mental unwellness. But we should be careful with these self-reported statistics - as from studies conducted outside of this work, and within society in general, there remains a stigma around mental health, and arguably it is less well understood. This could lead to under reporting of mental unwellness.
+
+```{r}
+
+#plot % of days unwell physical vs. mental
+D2 <- brfss2013 %>% gather(Health, Days, c(ph.band, me.band)) %>% 
+  group_by(Health, Days) %>% 
+  summarise(count=n(), Percentage = n()*100/nrow(brfss2013))
+D2$Health <- factor(D2$Health, levels = c("ph.band", "me.band"))
+ggplot(data=D2, aes(x=Days, y=Percentage, fill=Health)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  ggtitle("Figure 3: Proportion of US population who reported 0, 1-9, 10+ days unwell") +
+  xlab("Days unwell (grouped)") +
+  scale_fill_discrete(name = "Health", labels = c("Physcially", "Mentally"))
+
+```
+
+Finally figure 4 shows the overlap of physical and mental wellness. We see that 50% of the sample had at least one day in the past 30 where they felt either physically or mentally unwell. When you consider these days unwell may translate into a day off work, the potential impact on the US workforce is not insignificant. Therefore, in question 2 we'll explore how this varies by demographic - particularly focusing on differences between working age, and retired age groups.
+
+```{r fig.asp = 0.35}
+
+#prepare data for ggplot
+D3 <- brfss2013 %>% group_by(ph.band2, me.band2) %>% summarise(percent = round(n()*100 / nrow(brfss2013)), 1) %>% 
+  mutate(combo = factor(paste(ph.band2, me.band2, sep = ""),
+                        levels = c("00", "01+", "1+0", "1+1+"),
+                        labels = c("Zero days unwell", "At least 1 mental, no physical", "At least 1 physical, no mental", "At least 1 mental, and 1 physical"))) %>% mutate(combo = fct_rev(combo))
+
+#plot overlap in physical and mental unwellness
+ggplot(data=D3, aes(y=percent, x="Health", fill = combo)) + 
+  geom_bar(stat = "identity") + coord_flip() + 
+  scale_fill_discrete(name = "Key") + 
+  theme(axis.ticks = element_blank(), axis.text.y = element_blank(), axis.title.y = element_blank(), aspect.ratio = 0.4) + 
+  ggtitle("Figure 4: Proportion who reported at least 1 day unwell (in last 30)")
+
+```
+
+**Research question 2:** Is there a relationship between demographic grouping and reported unwell days?
+
+We'll start by looking at the proportion of each age group who reported least one unwell day (physical or mental) in the last 30 days. In figure 5 we see that 18-24s have the lowest proportion of unwell days, while the 65 and over group have the most. However interestingly, the proportion changes very little between 25 and 64 years of age. Just under half of all those 65 and under (working age) report at least one unwell day. 
+
+```{r}
+
+#prepare data
+D4 <- brfss2013 %>% mutate(combined = if_else(Physical == 0 & Mental == 0, "Zero", "At least 1"))
+D4 <- table(D4$combined, D4$Age) %>% prop.table(2)*100
+D4 <- as.data.frame(D4)
+
+#plot chart
+ggplot(data=D4, aes(y=Freq, x=Var2, fill = Var1)) + 
+  geom_bar(stat = "identity") + 
+  scale_fill_discrete(name = "Days unwell (mental or physical)") + 
+  xlab("Age") + 
+  ylab("Percentage") + 
+  ggtitle("Figure 5: Proportion of US population who reported at least 1 unwell day") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+
+In figure 6 we can see physical unwellness across different age groups. There are big differences in the number of reported unwell days by age, with 18-24 year olds reporting on average 2 unwell days due to physical health, compared with those 55+ and over reporting on average 5 unwell days due to physical health. There is also an increase in variation of unwell days as age increases. 
+
+
+```{r}
+
+#output summary stats
+F6 <- brfss2013 %>% gather(Health, Days, c(Physical, Mental)) %>%
+  filter(Health == "Physical") %>%
+  select(Age, Days) %>%
+  group_by(Age) %>%
+  summarise(Mean = round(mean(Days), 1), 'Standard deviation' = round(sd(Days),1), Median = round(median(Days), 1), IQR = IQR(Days)) 
+
+kable(F6, caption = "Figure 6: Average number of days physically unwell (statistics)", padding = 0)
+
+```
+
+In figure 7 we can contrast this with mental unwellness, where the number of days unwell is actually lowest among the oldest age group, with an average of 4 mental unwell days for those aged 18 to 64, dropping to an average of 2 days among those 65 and over.
+
+```{r}
+
+#output summary stats
+F7 <- brfss2013 %>% gather(Health, Days, c(Physical, Mental)) %>%
+  filter(Health == "Mental") %>%
+  select(Age, Days) %>%
+  group_by(Age) %>%
+  summarise(Mean = round(mean(Days), 1), 'Standard deviation' = round(sd(Days),1), Median = round(median(Days), 1), IQR = IQR(Days)) 
+
+kable(F7, caption = "Figure 7: Average number of days mentally unwell (statistics)", padding = 0)
+
+```
+
+
+
+
+In figure 8 we compare mental and physical unwellness side by side, to highlight these differences. Interesting while physical health gets increasing worse with age, as we'd likely expect, in contrast mental health is highest among the 18-24 and 45-54 age groups, and then drops off steeply among 65+. 
+
+We can speculate as to the different factors that might be driving this reduction in mental unwellness among those 65 and over. Perhaps work related stress is leading to mental health unwellness among those under 65. In addition to work, family matters, finances and parenthood may also add to stress levels and cause mental unwellness. While the retired age group, may be less likely to be suffering from work or family related stress. Another possible factor is that those who have severe mental health problems take their own lives earlier in life, and therefore are not seen in the 65+ age group, leading to a lower average. Or perhaps the older generation are less likely to admit to mental unwellness in a self-reported survey, and we're seeing a greater stigma associated with mental health among the oldest age group. 
+
+```{r}
+
+#prepare data for ggplot
+D5 <- brfss2013 %>% gather(Health, Days, c(Physical, Mental)) %>% select(Age, Health, Days) %>% group_by(Age, Health) %>% summarise(Mean=mean(Days))
+D5$Health <- factor(D5$Health, levels = c("Physical", "Mental"))
+
+#plot data
+ggplot(data=D5, aes(x=Age, y=Mean, fill = Health)) + geom_bar(stat = "identity", position = "dodge") + scale_x_discrete(labels = c("18-24", "25-34", "35-44", "45-54", "55-64", "65+")) + ggtitle("Figure 8: Average number of physical and mental unwell days by age")
+
+
+```
+
+Having explored differences by age, we'll also look for any differences by gender. In figure 9 we can see that females report on average more physically unwell days than males, in every age band. The difference is most stark among the 45-54 age group, where females report on average one day more unwell than males. This could be a result of women having more physical health issues than men, or it could be that women are more likely than men to report these issues in this survey.
+
+```{r}
+
+#prepare data for ggplot
+D6 <- brfss2013 %>% gather(Health, Days, c(Physical, Mental)) %>% select(Age, Gender, Health, Days) %>% group_by(Age, Gender, Health) %>% summarise(mean=mean(Days)) %>% filter(Health == "Physical")
+D6$Health <- factor(D6$Health, levels = c("Physical", "Mental"))
+D6$Health <- factor(D6$Gender, levels = c("Male", "Female"))
+
+#plot data
+ggplot(data=D6, aes(x=Age, y=mean, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + ggtitle("Figure 9: Average number of physically unwell days") + ylab("Average number of days unwell in 30") + scale_y_continuous(breaks = c(1,2,3,4,5))
+
+
+```
+
+In figure 10 we can see how mental unwellness varies by different age and gender groups. As with physical unwellness, we see higher reported mental unwellness among women than men. Among men, those aged 18-34 and 45-54 report the highest average number of unwell days. While for women, 18-24 year olds report the highest number of unwell days, and this drops among 25-34, and 35-44 year olds, before rising again among 45-54 year olds. For both men and women, mental unwellness declines among the 65+ age group, with an even steeper decline for women. The average number of unwell mental days is most similar for men and women, among the 65+ age group (but still higher among women).
+
+
+```{r}
+
+#prepare data for ggplot
+D7 <- brfss2013 %>% gather(Health, Days, c(Physical, Mental)) %>% select(Age, Gender, Health, Days) %>% group_by(Age, Gender, Health) %>% summarise(mean=mean(Days)) %>% filter(Health == "Mental")
+D7$Health <- factor(D6$Health, levels = c("Physical", "Mental"))
+D7$Health <- factor(D6$Gender, levels = c("Male", "Female"))
+
+#plot data
+ggplot(data=D7, aes(x=Age, y=mean, fill = Gender)) + geom_bar(stat = "identity", position = "dodge") + ggtitle("Figure 10: Average number of mentally unwell days") + ylab("Average number of days unwell in 30") + scale_y_continuous(breaks = c(1,2,3,4,5))
+
+
+```
+
+
+**Research question 3:** Is there an association between reported unwell days for mental and physical health?
+
+Here we want to understand if those who have reported physically unwell days, are more or less likely to have reported mentally unwell days. Figure 11 shows that as the number of physical unwell days increases, so does the proportion of those who reported a mentally unwell day. This starts to suggest a relationship between the two, and that perhaps being physically unwell, could increase someone's chances of being mentally unwell. 
+
+```{r}
+F11 <- table(brfss2013$me.band2, brfss2013$ph.band) %>% prop.table(2)*100
+F11 <- as.data.frame(F11)
+ggplot(data=F11, aes(y=Freq, x=Var2, fill = Var1)) + geom_bar(stat = "identity") +
+  scale_fill_discrete(name = "Days mentally unwell") + xlab("Days physically unwell") + ylab("Percentage") + ggtitle("Figure 11: Proportion who reported at least one day mentally unwell")
+
+```
+
+We should also consider if those who have reported mentally unwell days, are also likely to report physical days unwell. In figure 12, we see that as the average number of mentally unwell days increases, so does the proportion of people who also reported a physically unwell day. This suggests there is a relationship between the two. It might be that the two types of health are intrinsically connected, so if you are physically unwell you are more likely to be mentally unwell. Or perhaps physical unwellness actually causes mental unwellness (or vice versa). 
+
+From this study we can conclude there is a positive relationship between physical and mental unwellness, however we cannot make conclusions about causation, and we don't know if one factor drives the other.
+
+```{r}
+F12 <- table(brfss2013$ph.band2, brfss2013$me.band) %>% prop.table(2)*100
+F12 <- as.data.frame(F12)
+ggplot(data=F12, aes(y=Freq, x=Var2, fill = Var1)) + geom_bar(stat = "identity") +
+  scale_fill_discrete(name = "Days physically unwell") + xlab("Days mentally unwell") + ylab("Percentage") + ggtitle("Figure 12: Proportion who reported at least one day mentally unwell")
+
+```
+

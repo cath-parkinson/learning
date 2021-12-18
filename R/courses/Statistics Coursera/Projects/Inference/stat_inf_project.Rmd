@@ -1,0 +1,132 @@
+---
+title: "Statistical inference with the GSS data"
+output: 
+  html_document: 
+    fig_height: 4
+    highlight: pygments
+    theme: spacelab
+---
+
+## Setup
+
+### Load packages
+
+```{r load-packages, message = FALSE, warning = FALSE}
+library(ggplot2)
+library(dplyr)
+library(statsr)
+library(forcats)
+```
+
+### Load data
+
+```{r load-data}
+load("gss.Rdata")
+```
+
+
+
+* * *
+
+## Part 1: Data
+
+The GSS is a social survey conducted in the United States, tracking trends in attitudes and behaviours since 1972. Its sampling frame is designed to be as representative of the population as possible, interviewing respondents who choose to opt in, face to face. It's an observational study, using random sampling. That means we can generalise our conclusions to the population of American adults. However random assignment is not used, so we will focus our analysis on interesting relationships between factors, without being able to prove causation (whether or not one factor drives another).
+
+* * *
+
+## Part 2: Research question
+
+This analysis using the GSS data set will look at the following question.
+
+**Has there been a significant change in attitudes to abortion in US in the last 30 years, and in which direction?**
+
+Women in the US have many more rights and are increasingly less discriminated against than 30 years ago. However abortion, an important women's issue, remains contentious; frequently and sometimes furiously discussed within society. So with the changing attitudes towards equality for women, has there also been a significant change in attitudes towards abortion?
+
+* * *
+
+## Part 3: Exploratory data analysis
+
+Our analysis uses one key question of interest: "Please tell me whether or not you think it should be possible for a pregnant woman to obtain a legal abortion if: The woman wants it for any reason?". Respondents could answer "Yes", "No", or "Don't know". 
+
+We'll start by looking at how the proportion of US citizens who said "Yes" has changed since 1978.
+
+```{r}
+
+#filter data to look at key variables, and remove years where question was not asked
+filter <- gss %>% select(year, abany) %>% filter(!is.na(abany))
+data <- filter %>% count(year, abany) %>% group_by(year) %>%
+  mutate(percent = n *100/ sum(n)) %>% ungroup()
+
+#chart data over time
+data %>% filter(abany == "Yes") %>% ggplot(aes(x = year, y=percent)) + geom_bar(stat="identity") + scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) + xlab("Year") + ylab("Agree %") + ggtitle("Proportion of US Citizens who agree: Abortion should be possible for any reason")
+
+```
+
+Note, in some years, GSS did not run a survey (explaining the gaps in the bar chart). 
+
+We can see the proportion of US citizens who agree with legal abortion in any circumstances has grown over time. It was lowest in 1979, when just 33% of citizens agreed, and highest in 1995, when 47% agreed. The data ends in 2012, with 44% agreement within US adults.
+
+In order to understand if this has changed significantly, we'll group our data into two key time periods.
+
+* Decade 1: 1978-1988
+* Decade 2: 2002-2012
+
+```{r}
+
+#group data into decades
+decades <- filter %>% mutate(year = ifelse(year < 1989 & year > 1977, "78-88", 
+                                           ifelse(year > 2001, "02-12", "Other"))) %>% 
+  filter(year != "Other")
+
+#chart data
+decades$year <- as_factor(decades$year)
+decades$year <- factor(decades$year, levels = c("78-88", "02-12"))
+data_2 <- decades %>% count(year, abany) %>% group_by(year) %>%
+  mutate(percent = round(n*100 / sum(n)),1) %>% ungroup() %>% filter (year != "Other")
+data_2 %>% filter(abany == "Yes") %>% 
+  ggplot(aes(x = year, y=percent)) + geom_bar(stat = "identity", width = 0.5)+ ylab("Agree %") + xlab("Decade") + ggtitle("Proportion of US Citizens who agree: Abortion should be possible for any reason") + geom_text(aes(label=percent), vjust = 1.5, colour = 'white')
+
+```
+
+From this we can see the proportion has increased from 37% to 42%, but we'll need to perform a hypothesis test to understand if this is a significant increase.
+
+* * *
+
+## Part 4: Inference
+
+We want to use inference to understand the difference between two proportions, taken from different sample groups in our study. We'll start by stating our hypotheses.
+
+Null hypothesis: The number of US citizens who agree that abortion is acceptable under any circumstances has not changed from 1978-88 to 2002-12. 
+ 
+$\hat{p}_{1}$ - $\hat{p}_{2}$ = 0
+
+Alternative hypothesis: The number of US citizens who agree that abortion is acceptable under any circumstances has changed signifcantly from 1978-88 to 2002-12.
+
+Having set up our hypotheses, we'll now check conditions.
+
+**Independence within groups**: We can assume the sampled observations are independent, given the sampling was random, and interviews are conducted separately, independent from other interviewees. We are definitely sampling less than 10% of the population.
+**Independence between groups**: Each sample was collected separately from the other samples (and within different periods of time)
+**Sample size / skew**: We are well above the np >= 10 success - failure condition for both samples. Therefore we can assume the sampling distribution of the difference between two proportions is nearly normal, and we can proceed to use a z-test.
+
+We can now compute our confidence interval. Our response variable is agreement with abortion - yes or no, and our explanatory variable is the decade.
+
+```{r}
+inference(y = abany, x = year, data = decades, statistic = "proportion", type = "ci", 
+          method = "theoretical", success = "Yes")
+```
+
+Our confidence interval at 95% significance is 95% CI (78-88 - 02-12): (-0.0637 , -0.0352) - it does not include 0, suggesting that there has indeed been a significant shift. 
+
+Next we'll conduct a hypothesis test. We'll use a 95% significance level, and a two sided test - we do not know which way attitudes might have changed.
+
+```{r}
+inference(y = abany, x = year, data = decades, statistic = "proportion", type = "ht", alternative = "twosided", method = "theoretical", success = "Yes", null = 0)
+```
+
+Our hypothesis test results in a p-value that is significantly lower than 0.05, therefore it's extremely unlikely we'd get this result, if attitudes to abortion have not changed since 1978-88. That means we reject our null hypothesis, and accept the alternative - we have seen a significant change in attitudes to abortion in the last 30 years.
+
+The confidence interval and the hypothesis test agree - both point to a significant change in attitudes. However noteably the proportion of adults who think it is ok for a women to have an abortion in any circumstances remains below 50%, so there is a greater proportion of US adults who don't agree it's ok. It would be interesting to look at the results by different groups such as age, gender, region and religious believes, to identify any differences, and if there are any groups where agreement is higher than 50%.
+
+
+
+
