@@ -1,7 +1,7 @@
 library(stringr)
 library(stringi)
 library(tidyverse)
-library(un)
+#library(un)
 
 data <- "data-raw/day6_input.txt"
 data <- scan(data, what = "list", sep = "\r", blank.lines.skip = F,

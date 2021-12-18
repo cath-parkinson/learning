@@ -3,7 +3,9 @@
 #the while loop
 #not actually used that much in r, because it has other means of achieveing the same results from functions such as sapply, lapply and so. But it's important to understand how this is working in the background
 
-while(#a logical expression goes in here e.g. abc){ #here goes the body of the loop, e.g. xyz
+while(x){ 
+  #a logical expression goes in here e.g. abc)
+  #here goes the body of the loop, e.g. xyz
   
 }
 
@@ -40,7 +42,8 @@ while(counter < 5){
 #the for loop
 #similar to the while loop, but argueably more useful
 
-for(#different from the while loop, this specifies the iterations - what are we going to iterate over?){
+for(i in 1:len(x)){
+  #different from the while loop, this specifies the iterations - what are we going to iterate over?
   #this part of the loop works in the same way
   }
 
