@@ -71,3 +71,21 @@ l2[[3]] <- 4
 # you can print a full list of the object 
 lobstr::ref(l1,l2)
 
+# object size ####
+
+y <- rep(list(runif(1e4)), 100)
+
+# use this function to tell us how much memory this object uses
+# because the list is simply references to an object
+# actually the object is the same - the reference is repeated
+obj_size(y)
+#> 80,896 B
+
+# note this alternative function cannot tell if elements of the list are repeated
+# therefore it assumes they are different
+# note!! this matches the estimate given in rstudio
+object.size(y)
+#> 8005648 bytes
+
+x <- c(1, FALSE)
+typeof(x)
