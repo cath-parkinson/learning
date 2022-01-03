@@ -8,7 +8,7 @@ ui <- fluidPage(
 
 server <- function(input, output, server) {
   
-=  greeting <- reactive(paste0("Hello ", input$name))
+  greeting <- reactive(paste0("Hello ", input$name))
   output$greeting <- renderText(greeting())
   
   var <- reactive(df[[input$var]])
