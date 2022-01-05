@@ -1,0 +1,137 @@
+# 19.3.2
+# https://mastering-shiny.org/scaling-modules.html
+library(shiny)
+
+
+# dataset module ui
+datasetInput <- function(id, filter = NULL) {
+  
+  ns <- NS(id)
+  names <- ls("package:datasets")
+  # produces a list of names in the datasets package that is a dataframe
+  if (!is.null(filter)) {
+    data <- lapply(names, get, "package:datasets")
+    names <- names[vapply(data, filter, logical(1))]
+  }
+  
+  selectInput(ns("dataset"), "Pick a dataset", choices = names)
+}
+
+# dataset module server 
+datasetServer <- function(id) {
+  # input$dataset is the name of the dataset selected
+  # get passes back the actual dataframe
+  moduleServer(id, function(input, output, session) {
+    reactive(get(input$dataset, "package:datasets"))
+  })
+}
+
+filterInput <- function(id){
+  
+  ns <- NS(id)
+  selectInput(ns("filter"), "Filter", choices = c("Numeric", "Character", "Factor"))
+  
+}
+
+filterServer <- function(id){
+  
+  moduleServer(id, function(input, output, session) {
+    
+    reactive({ 
+      
+      if(input$filter == "Numeric") { type_selected <- is.numeric }
+      if(input$filter == "Character") { type_selected <- is.character }
+      if(input$filter == "Factor") { type_selected <- is.factor }
+      
+      return(type_selected)
+      
+    })
+    
+  })
+  
+  
+}
+
+
+
+# helper function
+# pass the dataframe
+# pass the filter function you want e.g. is.numeric, is.character, is.factor
+# passes back a list of variables that match the dataset and filter
+
+find_vars <- function(data, filter) {
+  stopifnot(is.data.frame(data))
+  stopifnot(is.function(filter))
+  names(data)[vapply(data, filter, logical(1))]
+}
+
+# module ui
+selectVarInput <- function(id) {
+  ns <- NS(id)
+  selectInput(ns("var"), "Variable", choices = NULL) 
+}
+
+
+# module server that returns a name and a value
+selectVarServer <- function(id, data, filter) {
+  
+  stopifnot(is.reactive(data))
+  stopifnot(is.reactive(filter))
+  
+  moduleServer(id, function(input, output, session) {
+    observeEvent({ 
+      data()
+      filter()}, {
+        updateSelectInput(session, "var", choices = find_vars(data(), filter()))
+      })
+    
+    reactive(data()[[input$var]])
+  })
+}
+
+summaryOutput <- function(id) {
+  tags$ul(
+    tags$li("Min: ", textOutput(NS(id, "min"), inline = TRUE)),
+    tags$li("Max: ", textOutput(NS(id, "max"), inline = TRUE)),
+    tags$li("Missing: ", textOutput(NS(id, "n_na"), inline = TRUE))
+  )
+}
+
+summaryServer <- function(id, var) {
+  
+  moduleServer(id, function(input, output, session) {
+    rng <- reactive({
+      req(is.numeric(var()))
+      range(var(), na.rm = TRUE)
+    })
+    
+    output$min <- renderText(rng()[[1]])
+    output$max <- renderText(rng()[[2]])
+    output$n_na <- renderText(sum(is.na(var())))
+  })
+}
+
+
+
+
+# bring it together in an app
+selectVarApp <- function() {
+  ui <- fluidPage(
+    datasetInput("data", is.data.frame),
+    filterInput("filter"),
+    selectVarInput("var"),
+    verbatimTextOutput("out"),
+    summaryOutput("summary")
+  )
+  server <- function(input, output, session) {
+    data <- datasetServer("data")
+    filter <- filterServer("filter")
+    var <- selectVarServer("var", data, filter)
+    output$out <- renderPrint(var())
+    summaryServer("summary", var)
+  }
+  
+  shinyApp(ui, server)
+}
+
+selectVarApp()
