@@ -16,7 +16,8 @@ home_ui <- function(id) {
            #           placeholder = "No project selected")
            sliderInput(inputId = ns("slider"),
                        label = "test", min = 0, max = 10, value = 1),
-           textOutput(outputId = ns("answer"))
+           textOutput(outputId = ns("answer")),
+           textOutput(outputId = ns("tellmeid"))
            
   )
   
@@ -41,6 +42,8 @@ home_server <- function(id) {
                    text <- eventReactive(input$new_project, { return("well done you clicked a button") })
                    output$text <- renderText({ text() })
                    output$answer <- renderText({ input$slider })
+                   output$tellmeid <- renderText({ id })
+                   
                    
               
                  })
@@ -49,10 +52,10 @@ home_server <- function(id) {
 
 # test module home working
 
-# ui <- fluidPage(home_ui("home1"))
-# server <- function(input, output, session){ home_server("home1")}
-# 
-# shinyApp(ui = ui, server = server)
+ui <- fluidPage(home_ui("home1"))
+server <- function(input, output, session){ home_server("home1")}
+
+shinyApp(ui = ui, server = server)
 
 
 
