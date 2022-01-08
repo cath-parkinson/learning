@@ -1,3 +1,5 @@
+# 3) bring module and configularble elements togther
+
 library(shiny)
 library(shinydashboard)
 

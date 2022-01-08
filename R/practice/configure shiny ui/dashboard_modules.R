@@ -1,4 +1,4 @@
-# shiny dashboard successfully decomposed into modules
+# 1) shiny dashboard successfully decomposed into modules
 
 library(shiny)
 library(shinydashboard)

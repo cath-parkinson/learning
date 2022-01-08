@@ -1,4 +1,4 @@
-# create sidebar items using config file 
+# 1) create sidebar items using config file 
 # they update when you change config file
 
 library(shiny)
