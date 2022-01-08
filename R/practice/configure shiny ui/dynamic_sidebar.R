@@ -1,3 +1,6 @@
+# create sidebar items using config file 
+# they update when you change config file
+
 library(shiny)
 library(shinydashboard)
 
@@ -22,16 +25,11 @@ build_sidebar_menu <- function(list){
 }
 
 # Sidebar -------------------------------------
-menuitems_created <- build_sidebar_menu(list)
-
 sidebar <- dashboardSidebar(
   
-  do.call(sidebarMenu, menuitems_created)
+  do.call(sidebarMenu, build_sidebar_menu(list))
+ 
   
-  
-  # sidebarMenu(id = "tabs",
-  #             menuItem(text = "home", tabName = "home"),
-  #             menuItem(text = "data", tabName = "data"))
   )
 
 # Body -------------------------------------------
