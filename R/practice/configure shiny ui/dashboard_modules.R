@@ -12,8 +12,8 @@ mod_bbos_ui <- function(id){
   sidebar <- dashboardSidebar(
     
     sidebarMenu(id = ns("tabs"),
-                menuItem(text = "home",tabName = ns("home")),
-                menuItem(text = "data", tabName = ns("data")))
+                menuItem(text = "home",tabName = "home"),
+                menuItem(text = "data", tabName = "data"))
   
         )
   
@@ -26,8 +26,8 @@ mod_bbos_ui <- function(id){
     ),
     
     tabItems(
-      tabItem(tabName = ns("home"), home_ui("home1")),
-      tabItem(tabName = ns("data"), home_ui("data1")))
+      tabItem(tabName = "home", home_ui("home1")),
+      tabItem(tabName = "data", home_ui("data1")))
   )
   
   # return dashboard ------------------------------------------
