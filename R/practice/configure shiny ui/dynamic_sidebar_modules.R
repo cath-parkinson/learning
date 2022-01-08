@@ -47,7 +47,8 @@ mod_bbos_ui <- function(id, config){
     
     
     tabItems(
-      tabItem(tabName ="home"))
+      tabItem(tabName = "home", home_ui("home1")),
+      tabItem(tabName = "data", home_ui("data1")))
   )
   
   # return dashboard ------------------------------------------
@@ -62,6 +63,9 @@ mod_bbos_ui <- function(id, config){
 # module bbos server ----------------------
 mod_bbos_server <- function(id, config){
   
+  home_server("home1")
+  home_server("data1")
+  
   moduleServer(id, function(input, output, session){
     
     
@@ -72,7 +76,7 @@ mod_bbos_server <- function(id, config){
 
 # call app ----------------------------------------------
 
-config <- c("home", "data", "nesting", "wewin" ,"ithnk")
+config <- c("home", "nesting", "wewin" ,"ithnk")
 ui <- function(){ mod_bbos_ui("bbos", config) }
 server <- function(input, output, session){ mod_bbos_server("bbos", config) }
 
