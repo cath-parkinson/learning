@@ -23,6 +23,15 @@ build_sidebar_menu <- function(ns, config){
   return(list_menuItems)
 }
 
+build_body_tabItems <- function(config) {
+  
+  # build_body_tabItem <- function(x,y,z) { menuItem(tabName = y)}
+  # 
+  # list_tabItems <- mapply()
+  # 
+}
+
+
 # check <- build_sidebar_menu(ns, config)
 
 # mod bbos ui -------------------------------------------
@@ -35,7 +44,7 @@ mod_bbos_ui <- function(id, config){
     
     do.call(sidebarMenu, build_sidebar_menu(ns, config))
     
-        )
+    )
   
   # Body -------------------------------------------
   body <- dashboardBody(
@@ -49,6 +58,9 @@ mod_bbos_ui <- function(id, config){
     tabItems(
       tabItem(tabName = "home", home_ui("home1")),
       tabItem(tabName = "data", home_ui("data1")))
+    
+    # do.call(tabItems, build_body_tabItems(config))
+    
   )
   
   # return dashboard ------------------------------------------

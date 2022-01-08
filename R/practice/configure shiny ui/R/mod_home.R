@@ -49,10 +49,10 @@ home_server <- function(id) {
 
 # test module home working
 
-ui <- fluidPage(home_ui("home1"))
-server <- function(input, output, session){ home_server("home1")}
-
-shinyApp(ui = ui, server = server)
+# ui <- fluidPage(home_ui("home1"))
+# server <- function(input, output, session){ home_server("home1")}
+# 
+# shinyApp(ui = ui, server = server)
 
 
 
