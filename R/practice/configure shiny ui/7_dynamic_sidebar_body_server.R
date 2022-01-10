@@ -42,7 +42,7 @@ build_body_tabItems <- function(config) {
 
 build_mod_server <- function(config){
   
-  mapply(function(x,y){ do.call(x, list(y))}, config$server_ui, config$id)
+  mapply(function(x,y){ do.call(x, list(y))}, config$mod_server, config$id)
   
 }
 
