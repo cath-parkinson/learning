@@ -28,7 +28,7 @@ home_server <- function(id,parentsession) {
                                 text = "well done you clicked a button",
                                 type = "success")
                      
-                     updateTabItems(session = parentsession,inputId = "tabs",selected = "database")
+                     updateTabItems(session = parentsession,inputId = "tabs",selected = "data")
                      
                    })
                    
