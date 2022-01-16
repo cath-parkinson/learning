@@ -14,9 +14,7 @@ config <- tibble(tabname = c("home", "database", "database2"),
                  sidebar_parent_tabname = c("home", "database", "database"))
 
 # functions ---------------------------------------------------------
-build_sidebar_menu <- function(config){
-  
-  menuitems_needed <- config %>% filter(sidebar_type == "menuItem") %>% select(tabname) %>% pull()
+build_sidebar_menuitems <- function(config){
   
   # 1) menuitems without submenuItems ---------------------------
   config_without <- config %>% filter(sidebar_type == "menuItem" & sidebar_parent == "N")
@@ -32,8 +30,8 @@ build_sidebar_menu <- function(config){
   config_with <- config %>% filter(sidebar_type == "menuItem" & sidebar_parent == "Y")
   config_subitems <- config %>% filter(sidebar_type == "menuSubItem")
   
-  list_menuItems_with <- build_sidebar_menu_subitems(config_with, config_subitems) 
-    
+  list_menuItems_with <- build_sidebar_menusubitems(config_with, config_subitems) 
+  
   # 3) bring together in final list
   list_menuItems <- c(id = "tabs", list_menuItems_without, list_menuItems_with)
   
@@ -41,7 +39,7 @@ build_sidebar_menu <- function(config){
 }
 
 #' Build the shiny dashboard sidebar menuSubitems
-build_sidebar_menu_subitems <- function(config_with, config_subitems){
+build_sidebar_menusubitems <- function(config_with, config_subitems){
   
   list_menuItems_with <- list()
   
@@ -62,7 +60,7 @@ build_sidebar_menu_subitems <- function(config_with, config_subitems){
                                 SIMPLIFY = F,
                                 USE.NAMES = F)
     
-    # pass the list of sub menus into the 
+    # create final list of arguments ready for menuItem
     menuItem_args <- c(text = text_i,
                        tabName = tabname_i,
                        startExpanded = T,
@@ -71,12 +69,16 @@ build_sidebar_menu_subitems <- function(config_with, config_subitems){
     # make the menuItem!
     list_menuItems_with[[i]] <- do.call(menuItem, menuItem_args)
     
-    # temporary fix for known problem with shiny menuItem
-    list_menuItems_with[[i]]$children[[1]]$attribs['data-toggle'] <- "tab"
-    list_menuItems_with[[i]]$children[[1]]$attribs['data-value'] <- tabname_i
+    # Fix to set the missing attributes needed for updateTabitem
+    # Plus remove the "treeview" class that gets added
+    list_menuItems_with[[i]]$children[[1]]$attribs["data-toggle"] <- "tab"
+    list_menuItems_with[[i]]$children[[1]]$attribs["data-value"] <- tabname_i
+    list_menuItems_with[[i]]$attribs$class <- NULL
   }
-  
+  print(list_menuItems_with[[1]]$children[[1]]$attribs)
+  print(list_menuItems_with[[1]]$attribs$class)
   return(list_menuItems_with)
+  
 }
 
 #' Build the shiny dashboard body tabItems
@@ -122,7 +124,6 @@ mod_02_home_01_ui <- function(id) {
   
 }
 
-##### Server #####
 mod_02_home_01_server <- function(id,parentsession) {
   
   moduleServer(id, function(input, output, session){
@@ -131,14 +132,14 @@ mod_02_home_01_server <- function(id,parentsession) {
                    
                      updateTabItems(session = parentsession,
                                   inputId = "tabs",
-                                  selected = "database1")
+                                  selected = "database")
                    })
                })
   }
 
 mod_os_ui <- function(id, config){
   
-  sidebar <- dashboardSidebar(do.call(sidebarMenu, build_sidebar_menu(config)))
+  sidebar <- dashboardSidebar(do.call(sidebarMenu, build_sidebar_menuitems(config)))
   body <- dashboardBody(do.call(tabItems, build_body_tabItems(config)))
   
   tagList(dashboardPage(dashboardHeader(),

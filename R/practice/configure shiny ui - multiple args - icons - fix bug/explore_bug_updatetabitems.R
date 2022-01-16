@@ -40,6 +40,9 @@ menuItem_without$children[[1]]$attribs['data-toggle'] %>% class()
 menuItem_without$children[[1]]$attribs['data-value']
 menuItem_without$children[[1]]$attribs['data-value'] %>% typeof()
 
+menuItem_without$children[[1]]$attribs
+menuItem_without$attribs$class
+
 
 # 2) menuitems with submenuItems
 
@@ -59,7 +62,15 @@ menuItem_args <- c(text = config_with$sidebar_text,
 # this is the only method where I use do.call to make menuItem!
 menuItem_with <- do.call(menuItem, menuItem_args)
 
-menuItem_with$children[[1]]
+menuItem_with$children[[1]]$attribs
+menuItem_with$children[[1]] %>% attributes()
+menuItem_with$children[[1]] %>% attr("href")
+
+# try setting this to NULL?
+menuItem_with$attribs$class 
+
+
+
 #These are the missing pieces - we will need to set these (
 # this will always be set to "tab"
 menuItem_with$children[[1]]$attribs['data-toggle'] <- "tab"
