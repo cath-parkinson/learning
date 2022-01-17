@@ -11,7 +11,10 @@ make_package_list <- function(){
   package_df <- installed.packages() %>% 
     as.tibble()
   
-  package_df <- package_df %>% filter(is.na(Priority))
+  # remove base R packages and INLA
+  package_df <- package_df %>% 
+    filter(is.na(Priority)) %>% 
+    filter(!Package == "INLA")
   
   package_list <- list()
   
