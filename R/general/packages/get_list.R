@@ -1,12 +1,17 @@
 # get list of installed packages
 library(tidyverse)
 
-package_df <- installed.packages() %>% 
-  as.tibble()
+# package_df <- installed.packages() %>% 
+#   as.tibble()
+# 
+# package_df <- package_df %>% filter(is.na(Priority))
 
-package_df <- package_df %>% filter(is.na(Priority))
-
-make_package_list <- function(package_df){
+make_package_list <- function(){
+  
+  package_df <- installed.packages() %>% 
+    as.tibble()
+  
+  package_df <- package_df %>% filter(is.na(Priority))
   
   package_list <- list()
   
@@ -21,7 +26,7 @@ make_package_list <- function(package_df){
   
 }
 
-package_list <- make_package_list(package_df)
+package_list <- make_package_list()
 
 # get in format needed for passing to renv.lock file function
 test <- list(digest = "0.6.22")
