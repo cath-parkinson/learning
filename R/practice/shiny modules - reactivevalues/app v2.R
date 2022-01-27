@@ -1,3 +1,6 @@
+# Pass and return reactive values from the modules
+# Crikey I think it's working
+
 # update values module -------------------------------------
 
 update_values_ui <- function(id){
@@ -7,8 +10,7 @@ update_values_ui <- function(id){
     
     actionButton(inputId = ns("update_value"),
                  label = "Update value"),
-    textOutput(outputId = ns("show_mylist")),
-    textOutput(outputId = ns("show_new_value"))
+    textOutput(outputId = ns("show_mylist"))
   )
   
 }
@@ -19,23 +21,16 @@ update_values_server <- function(id, mylist){
     
     output$show_mylist <- renderText({ mylist$mylist })
     
-    mylist$mylist <- eventReactive(input$update_value, {
+    observeEvent(input$update_value, { # we need to update reactiveValues using a observe event
 
-      mylist$mylist <- 2
+      mylist$mylist <- mylist$mylist + 1
 
-    })
-
-
-    # this works 
-    new_value <- eventReactive(input$update_value, {
-      
-      mylist$mylist + 5
-      
     })
     
-    output$show_new_value <- renderText({ new_value() })
+    return(mylist)
     
   })
+
 }
 
 # master module --------------------------------------------
@@ -44,8 +39,9 @@ mod_ui <- function(id){
   
   ns <- NS(id)
   fluidPage(
-    update_values_ui(ns("ex1"))
-    # textOutput(ns("show_scenarios"))
+    update_values_ui(ns("ex1")),
+    update_values_ui(ns("ex2")),
+    textOutput(ns("value_outside_mod"))
     
   )
   
@@ -56,14 +52,14 @@ mod_server <- function(id){
   moduleServer(id, function(input, output, session){
     
     mylist <- reactiveValues(mylist = 1)
+    mylist <- update_values_server("ex1", mylist) # I pass and return the whole mylist object
+    mylist <- update_values_server("ex2", mylist) # I pass and return the whole mylist object
     
-    update_values_server("ex1", mylist) # do I pass mylist or mylist$mylist?
-    
-    # output$show_scenarios <- renderText({
-    #   
-    #   list_out_scenarios(reop_master_list$reop_master_list)
-    #   
-    # })
+    output$value_outside_mod <- renderText({
+
+      mylist$mylist/10
+
+    })
     
   })
   
