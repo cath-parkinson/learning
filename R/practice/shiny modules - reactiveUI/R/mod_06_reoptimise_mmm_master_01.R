@@ -29,16 +29,11 @@ mod_06_reoptimise_mmm_master_01_ui <- function(id){
                       my_additional_style = "width:100%; margin-bottom:15px"))),
     
     
-    # mod_06_reoptimise_mmm_master_01_overview_ui("mmm_reop"),
-    # mod_06_reoptimise_mmm_master_01_media_ui("mmm_reop")
-    
-    # mod_06_reoptimise_mmm_master_01_content_ui("mmm_reop")
-    
     tabsetPanel(
       id = ns("mmm_master_panels"), # this must be name spaced
       type = "hidden",
       tabPanelBody("panel1", "some content1"),
-      tabPanelBody("panel2", "some content2"),
+      tabPanelBody("panel2", mod_06_reoptimise_mmm_master_01_media_ui("mmm_reop")),
       tabPanelBody("panel3", "some content3")
     )
 
@@ -50,6 +45,8 @@ mod_06_reoptimise_mmm_master_01_ui <- function(id){
 # server ------------------------------------------
 
 mod_06_reoptimise_mmm_master_01_server <- function(id){
+    
+  mod_06_reoptimise_mmm_master_01_media_server("mmm_reop") # this needs to sit outside the moduleServer
   
       moduleServer(id, function(input, output, session){
     
@@ -84,7 +81,6 @@ mod_06_reoptimise_mmm_master_01_server <- function(id){
     
     # core content ------------------------------
     # mod_06_reoptimise_mmm_master_01_overview_server("mmm_reop")
-    # mod_06_reoptimise_mmm_master_01_media_server("mmm_reop")
     # 
     
                                                    # ,
