@@ -2,6 +2,8 @@ library(shiny)
 library(shinyWidgets)
 library(tibble)
 library(mm.reoptimise)
+library(tidyr)
+library(dplyr)
 
 scenario_list <- mm.reoptimise::create_scenario_list("data/three2 - update")
 scenario <- scenario_list[[1]]
@@ -10,15 +12,18 @@ df <- scenario$curves_full
 
 # read in kpi_weight_master
 df <- df %>% 
-  select(kpi.level1_name, 
+  select(period_level1,
+         kpi.level1_name, 
          kpi.level2_name, 
-         kpi.level3_name) %>% 
-  distinct()
-
-df <- df %>% 
-  mutate(weight = 1) %>% 
-  mutate(selected = 0) 
-
+         kpi.level3_name,
+         kpi_unit,
+         kpi.level1_weight,
+         kpi.level2_weight,
+         kpi.level3_weight) %>% 
+  distinct() %>% 
+  mutate(master_weight = rowMeans(select(., contains("weight")), 
+                                  na.rm =T))
+   
 # functions
 
 get_kpi1 <- function(df, type = "all"){
