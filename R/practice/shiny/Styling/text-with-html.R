@@ -36,8 +36,8 @@ server <- function(input, output, session){
     HTML(
       paste(strong("Selected: "),
             "NEW")
-    )
-    )
+    ),
+    style = 'color:black')
   })
   
   
