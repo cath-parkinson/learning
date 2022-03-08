@@ -4,7 +4,9 @@ library(shinydashboard)
 #do.call is not needed! You can just pass a list of column objects fluidrow
 # https://github.com/rstudio/shiny/issues/809
 
-item1 <- column(2,
+condition <- T
+
+item1 <- column(3,
                valueBox(
                  paste0("TEST:"),
                  # value = "",
@@ -13,7 +15,7 @@ item1 <- column(2,
                  width = NULL))
 
 
-item2 <- column(4,
+item2 <- column(3,
                valueBox(
                  paste0("TEST2:"),
                  # value = "",
@@ -29,13 +31,14 @@ ui <- dashboardPage(
   dashboardSidebar(),
   dashboardBody(
   
-  uiOutput(outputId = "boxes")
+  uiOutput(outputId = "boxes_s1"),
+  uiOutput(outputId = "boxes_s2"),
   
 ))
 
 server <- function(input, output, session) {
   
-  output$boxes <- renderUI({
+  output$boxes_s1 <- renderUI({
     
     fluidRow(
       
@@ -43,8 +46,25 @@ server <- function(input, output, session) {
       
     )
     
+    })
+  
+  output$boxes_s2 <- renderUI({
+    
+    if(condition == T){
+      
+      
+      fluidRow(
+        
+        mylist
+      )
+      
+      
+    }
+    
     
   })
+  
+  
   
 }
 
