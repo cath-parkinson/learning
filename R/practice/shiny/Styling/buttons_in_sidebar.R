@@ -28,7 +28,7 @@ actionBttn_os <- function(inputId,
                           size = "sm", 
                           block = FALSE,
                           no_outline = TRUE, 
-                          my_additional_style = "height:60px") {
+                          my_additional_style = "height:55px") {
   value <- shiny::restoreInput(id = inputId, 
                                default = NULL)
   style <- match.arg(
@@ -96,14 +96,21 @@ sidebar <- dashboardSidebar(
                                         
                                         # Use fluidRow to ensure buttons are side by side
                                         fluidRow(
-                                          column(width = 3,
-                                                 uiOutput(outputId = ("bttn_save"))),
-                                          column(width = 3,
-                                                 # offset = 2,
-                                                 uiOutput(outputId = ("bttn_save_as"))),
-                                          column(width = 3,
+                                          column(width = 3
+                                                 ,
+                                                 uiOutput(outputId = ("bttn_save_as"))
+                                                 ),
+                                          column(width = 3
+                                                 ,
+                                                 offset = 2,
+                                                 uiOutput(outputId = ("bttn_save"))
+                                                 ),
+                                          column(width = 3
+                                                 # ,
                                                  # offset = 3,
-                                                 uiOutput(outputId = ("bttn_new")))),
+                                                 # uiOutput(outputId = ("bttn_new"))
+                                                 )
+                                          ),
                                         
                                         # fluidRow(
                                         #   column(width = 3,
@@ -176,7 +183,7 @@ server <- function(input, output, session){
                   # ,
                   # my_additional_style = 'display: inline-block; vertical-align:top;'
     )
-    
+
     
   })
   

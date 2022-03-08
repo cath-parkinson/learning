@@ -9,15 +9,15 @@ library(shinyalert)
 #' @param mytext "" or "name-desc" or "desc-inputname"
 #'
 #' @return A shiny alert function.
-mm_shinyalert <- function(myinputId,
+my_shinyalert <- function(myinputId,
                             mytitle,
                             mytext = c(""),
                             myconfirmButtonText = "ENTER",
                             confirmButtonCol = "#28b78d"){
   
-  if(mytext == "name-desc") { tagList(HTML(paste(strong("PIPE IN NAME:"), "pipe in desc"))) }
+  if(mytext == "name-desc") { mytext <- tagList(HTML(paste(strong("PIPE IN NAME:"), "pipe in desc"))) }
   
-  if(mytext == "desc-inputname") { tagList(
+  if(mytext == "desc-inputname") { mytext <- tagList(
     
     HTML(
       
@@ -53,7 +53,8 @@ ui <- fluidPage(
   actionButton(inputId = "button_new",
                label = "NEW"),
   actionButton(inputId = "mybutton",
-               label = "TEST")
+               label = "TEST"),
+  textOutput(outputId = "button_test_value")
   
 )
 server <- function(input, output, session) {
@@ -131,10 +132,22 @@ server <- function(input, output, session) {
   
   observeEvent(input$mybutton, {
     
-    reop_shinyalert(myinputId = "mynewbutton",
+    my_shinyalert(myinputId = "mynewbutton",
                     mytitle = "MY TEST",
-                    mytext = "")
+                    mytext = "name-desc")
       })
+  
+  
+  output$button_test_value <- renderText({
+    
+    
+    paste("run button val:" , input$mmm_run_user_confirm,
+    "test button val:" , input$mynewbutton)
+    
+    
+  })
+  
+  
   
   
   
