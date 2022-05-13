@@ -12,26 +12,23 @@ module_ui <- function(id){
   tagList(
     
     actionButton(inputId = ns("navigate"),
-                 label = "Navigate"),
-    textOutput(outputId = ns("show_mylist"))
+                 label = "Go to page 2")
   )
   
 }
 
-module_server <- function(id){
+module_server <- function(id, navigation_values){
   
   moduleServer(id, function(input, output, session){
     
-    # output$show_mylist <- renderText({ mylist$mylist })
-    # 
-    # observeEvent(input$update_value, { # we need to update reactiveValues using a observe event
-    # 
-    #   mylist$mylist <- mylist$mylist + 1
-    # 
-    # })
-    # 
-    # return(mylist)
-    # 
+    ns <- session$ns
+    
+    navigation_values <- reactiveValues()
+    
+    navigation_values$button1 = reactive(ns(input$navigate))
+    
+    return(navigation_values)
+    
   })
 
 }
@@ -57,6 +54,17 @@ sidebar <- dashboardSidebar(
 
 body <- dashboardBody(
   
+  tabItems(
+    
+    tabItem(
+      
+      tabName = "page1",
+      fluidPage(module_ui("mymodule"))
+      
+    )
+    
+  )
+  
 )
 
 ui <- dashboardPage(
@@ -66,7 +74,30 @@ ui <- dashboardPage(
   body
 )
 
-server <- function(input, output, session){}
+server <- function(input, output, session){
+  
+  navigation_values <- module_server("mymodule", navigation_values)
+  
+  # Strategy 1: The Hack ----------------------------------
+  
+  observeEvent(input[["mymodule-navigate"]], {
+    
+    # updateTabsetPanel(session, inputId = "mastertabs", selected = "page2")
+    
+  })
+  
+  # Strategy 2: Pass back a reactive values list ------------------------
+  
+  # Something about this is wrong
+  observeEvent(navigation_values$button1(), {
+    
+    updateTabsetPanel(session, inputId = "mastertabs", selected = "page2")
+    
+  })
+  
+  
+  
+}
 
 
 shinyApp(ui = ui, server = server)
