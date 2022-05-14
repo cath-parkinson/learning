@@ -1,6 +1,14 @@
 # Create a reactivevalues list of navigation values
 # Return that to the main app so we can use it to navigate
 
+# https://shiny.rstudio.com/articles/modules.html
+# The goal is not to prevent modules from interacting with their containing 
+# apps, but rather, to make these interactions explicit. If a module needs to 
+# use a reactive expression, the outer function should take the reactive 
+# expression as a parameter. If a module wants to return reactive expressions 
+# to the calling app, then return a list of reactive expressions from the 
+# function.
+
 library(shiny)
 library(shinydashboard)
 
