@@ -17,15 +17,13 @@ module_ui <- function(id){
   
 }
 
-module_server <- function(id, navigation_values){
+module_server <- function(id){
   
   moduleServer(id, function(input, output, session){
     
-    ns <- session$ns
-    
     navigation_values <- reactiveValues()
     
-    navigation_values$button1 = reactive(ns(input$navigate))
+    navigation_values$button1 = reactive(input$navigate)
     
     return(navigation_values)
     
@@ -76,19 +74,18 @@ ui <- dashboardPage(
 
 server <- function(input, output, session){
   
-  navigation_values <- module_server("mymodule", navigation_values)
+  navigation_values <- module_server("mymodule")
   
   # Strategy 1: The Hack ----------------------------------
   
-  observeEvent(input[["mymodule-navigate"]], {
-    
-    # updateTabsetPanel(session, inputId = "mastertabs", selected = "page2")
-    
-  })
-  
+  # observeEvent(input[["mymodule-navigate"]], {
+  # 
+  # updateTabsetPanel(session, inputId = "mastertabs", selected = "page2")
+  # 
+  # })
+
   # Strategy 2: Pass back a reactive values list ------------------------
   
-  # Something about this is wrong
   observeEvent(navigation_values$button1(), {
     
     updateTabsetPanel(session, inputId = "mastertabs", selected = "page2")
