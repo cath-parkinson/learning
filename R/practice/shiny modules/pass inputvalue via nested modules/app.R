@@ -92,7 +92,16 @@ server <- function(input, output, session){
   # 
   # })
 
-  # Strategy 2: Pass back a reactive values list ------------------------
+  # Strategy 2a: Return the reactive value of the button explicitly --------
+  
+  # Haven't coded this as it feels more cumbersome than creating a
+  # reactive values list - as it would make it harder to keep track
+  # of all the values we need to do this for
+  
+  # Strategy 2b: Return a reactive values list ------------------------
+  
+  # Makes it easy to "keep track" of all the buttons we need to watch
+  # across what is a pretty sizeable app
   
   observeEvent(navigation_values$button1(), {
     
