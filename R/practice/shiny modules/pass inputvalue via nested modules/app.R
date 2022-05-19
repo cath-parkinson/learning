@@ -29,9 +29,20 @@ module_server <- function(id){
   
   moduleServer(id, function(input, output, session){
     
+    # Strategy 2 ---------------------------------
     navigation_values <- reactiveValues()
     
-    navigation_values$button1 = reactive(input$navigate)
+    # Strategy 2b -----------------------------------
+    # navigation_values$button1 = reactive(input$navigate)
+    
+    # Strategy 2c ---------------------------------------------
+    observeEvent(input$navigate, {
+
+      navigation_values$button1 = input$navigate
+
+    })
+
+    
     
     return(navigation_values)
     
@@ -103,14 +114,20 @@ server <- function(input, output, session){
   # Makes it easy to "keep track" of all the buttons we need to watch
   # across what is a pretty sizeable app
   
-  observeEvent(navigation_values$button1(), {
-    
+  # observeEvent(navigation_values$button1(), {
+  # 
+  #   updateTabsetPanel(session, inputId = "mastertabs", selected = "page2")
+  # 
+  # })
+
+  # Strategy 2c: As per 2 - but with an observeEvent rather than a reactive() -----------
+  
+  observeEvent(navigation_values$button1, {
+
     updateTabsetPanel(session, inputId = "mastertabs", selected = "page2")
-    
+
   })
-  
-  
-  
+
 }
 
 
