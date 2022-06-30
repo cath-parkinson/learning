@@ -1,6 +1,28 @@
+# More complicated than I thought because it depends
+# on how many rows there are
+
+text0 <- "METRIC 1 - METRIC 2"
+text0 <- "this text is"
+text0 <- "this text is longer"
+text0 <- "this text is even longer" # 1 \n
+text0 <- "this text is even longer again woah" # 2 \n
+text0 <- "this text is even longer than I would hope possible" # 3 \n
+
+
 df <- dplyr::tibble(fruit = c("Apples", "Pears", "Bananas", "Apples", "Pears", "Bananas"),
-             metric = c("METRIC 1", "METRIC 1", "METRIC 1", "METRIC 1 - METRIC 2", "METRIC 1 - METRIC 2", "METRIC 1 - METRIC 2"),
+             metric = c("METRIC 1", "METRIC 1", "METRIC 1", text0, text0, text0),
              value = c(1000, 2000, 3000, 2000, 3000, 3000))
+
+df2 <- dplyr::tibble(fruit = c("Peach", "Grape", "Plum", "Peach", "Grape", "Plum"),
+                    metric = c("METRIC 1", "METRIC 1", "METRIC 1", text0, text0, text0),
+                    value = c(1000, 2000, 3000, 2000, 3000, 3000))
+
+df3 <- dplyr::tibble(fruit = c("Peach1", "Grape1", "Plum1", "Peach1", "Grape1", "Plum1"),
+                     metric = c("METRIC 1", "METRIC 1", "METRIC 1", text0, text0, text0),
+                     value = c(1000, 2000, 3000, 2000, 3000, 3000))
+
+
+df <- dplyr::bind_rows(df, df2, df3)
 
 myplot <- ggplot2::ggplot(
   data = df,
@@ -32,42 +54,68 @@ myplot <- ggplot2::ggplot(
   )
 
 myplot
-
-myplotly <- plotly::ggplotly(myplot)
 myplotly
 
-# Move yaxis down to make room
-myplotly$x$layout$yaxis$range <- c(0.4, 4.2) # Original is c(0.4, 3.6)
+myplotly <- plotly::ggplotly(myplot)
+fix_plotly(myplotly)
 
-# Extend facet shapes down into the space
-myplotly$x$layout$shapes[[2]]$y0 <- -15
-myplotly$x$layout$shapes[[4]]$y0 <- -15
+# 1 \n
+myplotly$x$layout$yaxis$range <- c(0.4, 4.2) # Original is c(0.4, 3.6) - in units of the original chart
+myplotly$x$layout$shapes[[2]]$y0 <- -15 # Original is 0 - maybe in pixels?
+myplotly$x$layout$shapes[[4]]$y0 <- -15 # Original is 0
+myplotly$x$layout$annotations[[1]]$y <- 0.96 #Original is 1 - proportion of the screen
+myplotly$x$layout$annotations[[2]]$y <- 0.90 #Original is 1 
 
-# Move labels down to centre in the nearly extended shape
-myplotly$x$layout$annotations[[1]]$y <- 0.96 #if only 1 line we move less
-myplotly$x$layout$annotations[[2]]$y <- 0.9 # if /n is present we move more
+# 2 \n
+myplotly$x$layout$yaxis$range <- c(0.4, 5) # Original is c(0.4, 3.6)
+myplotly$x$layout$shapes[[2]]$y0 <- -35
+myplotly$x$layout$shapes[[4]]$y0 <- -35
+myplotly$x$layout$annotations[[1]]$y <- 0.91 #if only 1 line we move less
+myplotly$x$layout$annotations[[2]]$y <- 0.75 # if /n is present we move more
+
+# 3 \n
+myplotly$x$layout$yaxis$range <- c(0.4, 6) # Original is c(0.4, 3.6)
+myplotly$x$layout$shapes[[2]]$y0 <- -60
+myplotly$x$layout$shapes[[4]]$y0 <- -60
+myplotly$x$layout$annotations[[1]]$y <- 0.8 #if only 1 line we move less
+myplotly$x$layout$annotations[[2]]$y <- 0.6 # if /n is present we move more
 
 fix_plotly(myplotly)
 
+# Works if there is 1 new line - for each multiple line we need to move every thing more
+
 # Fix ggplotly facet_grid labels
 fix_plotly <- function(plotly_obj){
+  
+  # Identify max number of \n
+  facet1_count <- stringr::str_count(plotly_obj$x$layout$annotations[[1]]$text, "\\n")
+  facet2_count <- stringr::str_count(plotly_obj$x$layout$annotations[[2]]$text, "\\n")
+  
+  n <- max(facet1_count, facet2_count)
+  
+  if(n < 1) { return(plotly_obj) } 
+  else {
     
-  # Always adding 0.6 to the top of the yaxis range to make room for shape
-  plotly_obj$x$layout$yaxis$range[2] <- plotly_obj$x$layout$yaxis$range[2] +  0.6
+    range_ymax_shift <- n*(n + 5)/10 
+    
+  }
+  
+    # Always adding 0.6 to the top of the yaxis range to make room for shape
+  plotly_obj$x$layout$yaxis$range[2] <- plotly_obj$x$layout$yaxis$range[2] + range_ymax_shift
   
   # Extend shapes down (assumes there are two)
-  plotly_obj$x$layout$shapes[[2]]$y0 <- -15
-  plotly_obj$x$layout$shapes[[4]]$y0 <- -15
-  
-  # Move text down (assumes there are two)
-  facet1_text <- plotly_obj$x$layout$annotations[[1]]$text
-  if(grepl("\\n", facet1_text)){ plotly_obj$x$layout$annotations[[1]]$y <- 0.9 } 
-  else { plotly_obj$x$layout$annotations[[1]]$y <- 0.96 }
-  
-  facet2_text <- plotly_obj$x$layout$annotations[[2]]$text
-  if(grepl("\\n", facet2_text)){ plotly_obj$x$layout$annotations[[2]]$y <- 0.9 } 
-  else { plotly_obj$x$layout$annotations[[2]]$y <- 0.96 }
-  
+  plotly_obj$x$layout$shapes[[2]]$y0 <- -20
+  plotly_obj$x$layout$shapes[[4]]$y0 <- -20
+  # 
+  # # Move text down (assumes there are two)
+  # facet1_text <- plotly_obj$x$layout$annotations[[1]]$text
+  # if(grepl("\\n", facet1_text)){ plotly_obj$x$layout$annotations[[1]]$y <- 0.93 }
+  # else { plotly_obj$x$layout$annotations[[1]]$y <- 0.97 }
+  # # 
+  # facet2_text <- plotly_obj$x$layout$annotations[[2]]$text
+  # if(grepl("\\n", facet2_text)){ plotly_obj$x$layout$annotations[[2]]$y <- 0.93 }
+  # else { plotly_obj$x$layout$annotations[[2]]$y <- 0.97 }
+  # # 
   return(plotly_obj)
 }
 
