@@ -1484,15 +1484,15 @@
     },
     "mm.reoptimise": {
       "Package": "mm.reoptimise",
-      "Version": "0.1.1.9021",
+      "Version": "0.1.1.9029",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "mm.reoptimise",
       "RemoteUsername": "cath-parkinson",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "461bbe983841d5598fc9ef0cc6e66d55eb5ecd43",
-      "Hash": "1a59c45c2b0592711e0622f2bd152873",
+      "RemoteRef": "feature/check-inputdata",
+      "RemoteSha": "71bf8e60455d279a53d6e84831a3db8d8e4c3f1b",
+      "Hash": "bf6a0bdeef83ad19c6083f953c7a43b4",
       "Requirements": [
         "dplyr",
         "forcats",
@@ -1508,6 +1508,7 @@
         "stringr",
         "tibble",
         "tidyr",
+        "tidyselect",
         "writexl"
       ]
     },
@@ -2752,10 +2753,10 @@
     },
     "yaml": {
       "Package": "yaml",
-      "Version": "2.2.1",
+      "Version": "2.3.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "2826c5d9efb0a88f657c7a679c7106db",
+      "Hash": "458bb38374d73bf83b1bb85e353da200",
       "Requirements": []
     },
     "zip": {
