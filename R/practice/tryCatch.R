@@ -20,7 +20,6 @@ tryCatch(
   {
     mm.reoptimise::check_input_data(file_path)
     scenario <- mm.reoptimise::create_scenario(file_path)
-    # why does this return null?
     mm.reoptimise::check_input_data_matches_scenario_list(scenario, scenario_list)
     
   }
