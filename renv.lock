@@ -1482,7 +1482,7 @@
       "Hash": "18e9c28c1d3ca1560ce30658b22ce104",
       "Requirements": []
     },
-    "mm.reoptimise": {
+     "mm.reoptimise": {
       "Package": "mm.reoptimise",
       "Version": "0.1.1.9029",
       "Source": "GitHub",
@@ -1490,9 +1490,9 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "mm.reoptimise",
       "RemoteUsername": "cath-parkinson",
-      "RemoteRef": "feature/check-inputdata",
-      "RemoteSha": "71bf8e60455d279a53d6e84831a3db8d8e4c3f1b",
-      "Hash": "bf6a0bdeef83ad19c6083f953c7a43b4",
+      "RemoteRef": "dev",
+      "RemoteSha": "586172d74841eb1abcd1a350bc2b71fe70839d66",
+      "Hash": "dcd8a8c43a2257535558b67597b4d979",
       "Requirements": [
         "dplyr",
         "forcats",
