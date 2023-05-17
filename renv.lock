@@ -17,6 +17,14 @@
       "Hash": "4c152cf7672b93bbcd1bb34aeea0698d",
       "Requirements": []
     },
+    "BH": {
+      "Package": "BH",
+      "Version": "1.78.0-0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4e348572ffcaa2fb1e610e7a941f6f3a",
+      "Requirements": []
+    },
     "BayesFactor": {
       "Package": "BayesFactor",
       "Version": "0.9.12-4.3",
@@ -221,6 +229,17 @@
       "Hash": "59b7d0a3d18303ae30ba1246e77faa83",
       "Requirements": []
     },
+    "anytime": {
+      "Package": "anytime",
+      "Version": "0.3.9",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "74a64813f17b492da9c6afda6b128e3d",
+      "Requirements": [
+        "BH",
+        "Rcpp"
+      ]
+    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.1",
@@ -264,6 +283,33 @@
       "Requirements": [
         "Rcpp",
         "RcppArmadillo"
+      ]
+    },
+    "bigrquery": {
+      "Package": "bigrquery",
+      "Version": "1.4.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a6d0a9c88951c8542ac5af3e04260f8b",
+      "Requirements": [
+        "DBI",
+        "Rcpp",
+        "assertthat",
+        "bit64",
+        "brio",
+        "cli",
+        "curl",
+        "gargle",
+        "glue",
+        "httr",
+        "jsonlite",
+        "lifecycle",
+        "prettyunits",
+        "progress",
+        "rapidjsonr",
+        "rlang",
+        "tibble",
+        "withr"
       ]
     },
     "bit": {
@@ -898,19 +944,20 @@
     },
     "gargle": {
       "Package": "gargle",
-      "Version": "1.1.0",
+      "Version": "1.4.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "bc3bc77ea458de0a6efe94e8e7e9c641",
+      "Hash": "8c72a723822dc317613da5ff8e8da6ee",
       "Requirements": [
         "cli",
         "fs",
         "glue",
         "httr",
         "jsonlite",
+        "lifecycle",
+        "openssl",
         "rappdirs",
         "rlang",
-        "rstudioapi",
         "withr"
       ]
     },
@@ -1001,6 +1048,41 @@
       "Repository": "CRAN",
       "Hash": "b8bb7aaf248e45bac08ebed86f3a0aa4",
       "Requirements": []
+    },
+    "googleAuthR": {
+      "Package": "googleAuthR",
+      "Version": "2.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2584be5812542ebadaf1f4fc26d50178",
+      "Requirements": [
+        "assertthat",
+        "cli",
+        "digest",
+        "gargle",
+        "httr",
+        "jsonlite",
+        "memoise",
+        "rlang"
+      ]
+    },
+    "googleCloudStorageR": {
+      "Package": "googleCloudStorageR",
+      "Version": "0.7.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4ca15a842a0ff65d03fa296902e2d752",
+      "Requirements": [
+        "assertthat",
+        "cli",
+        "curl",
+        "googleAuthR",
+        "httr",
+        "jsonlite",
+        "openssl",
+        "yaml",
+        "zip"
+      ]
     },
     "googledrive": {
       "Package": "googledrive",
@@ -1207,10 +1289,10 @@
     },
     "httr": {
       "Package": "httr",
-      "Version": "1.4.2",
+      "Version": "1.4.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "a525aba14184fec243f9eaec62fbed43",
+      "Hash": "f6844033201269bec3ca0097bc6c97b3",
       "Requirements": [
         "R6",
         "curl",
@@ -1482,18 +1564,15 @@
       "Hash": "18e9c28c1d3ca1560ce30658b22ce104",
       "Requirements": []
     },
-     "mm.reoptimise": {
+    "mm.reoptimise": {
       "Package": "mm.reoptimise",
-      "Version": "0.1.1.9029",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "mm.reoptimise",
-      "RemoteUsername": "cath-parkinson",
-      "RemoteRef": "dev",
-      "RemoteSha": "586172d74841eb1abcd1a350bc2b71fe70839d66",
-      "Hash": "dcd8a8c43a2257535558b67597b4d979",
+      "Version": "0.2.9997",
+      "Source": "Local",
+      "RemoteType": "local",
+      "RemoteUrl": "../../Work/MeasureMonks//mm.reoptimise_0.2.9997.zip",
+      "Hash": "9d91b375ec4cda29aa8eb8e73dc397f4",
       "Requirements": [
+        "data.table",
         "dplyr",
         "forcats",
         "ggplot2",
@@ -1881,6 +1960,14 @@
         "zoo"
       ]
     },
+    "rapidjsonr": {
+      "Package": "rapidjsonr",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "88b9f48c93d17cdb811b54079a6a414f",
+      "Requirements": []
+    },
     "rappdirs": {
       "Package": "rappdirs",
       "Version": "0.3.3",
@@ -2028,10 +2115,10 @@
     },
     "rlang": {
       "Package": "rlang",
-      "Version": "0.4.12",
+      "Version": "1.1.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "0879f5388fe6e4d56d7ef0b7ccb031e5",
+      "Hash": "dc079ccd156cde8647360f473c1fa718",
       "Requirements": []
     },
     "rlist": {
@@ -2275,14 +2362,16 @@
     },
     "shinyWidgets": {
       "Package": "shinyWidgets",
-      "Version": "0.6.3",
+      "Version": "0.7.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "89b90f439e5a824f8bcbadd082106902",
+      "Hash": "2fb744ccca8ab2b6caf99e15dc5f0146",
       "Requirements": [
+        "anytime",
         "bslib",
         "htmltools",
         "jsonlite",
+        "rlang",
         "sass",
         "shiny"
       ]
