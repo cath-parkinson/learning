@@ -43,4 +43,4 @@ vignettes/*.pdf
 
 
 # ignore json key
-R/practice/*.json
+*.json
