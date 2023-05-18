@@ -27,6 +27,7 @@ gcs_upload(file = file.path(getwd(), "config.xlsx"),
 # download files
 gcs_get_object(object_name = "scenario_0/input_data.xlsx",
                bucket = "re_optimise-486",
+               # This can be a path to where you want the data to be saved - in shiny app, I want this to point to the temp directory that the r shiny app has access to
                saveToDisk = "input_data_downloaded.xlsx",
                overwrite = TRUE)
 
