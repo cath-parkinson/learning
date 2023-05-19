@@ -1,5 +1,5 @@
 # It's important to set the environment variables before we run the application
-Sys.setenv("GCS_AUTH_FILE" = file.path(getwd(), "measuremonks-tools-5d83c9d4859b.json"))
+Sys.setenv("GCS_AUTH_FILE" = file.path(getwd(), "measuremonks-tools-cb5499f780b1.json"))
 
 # Load required libraries
 library(shiny)
@@ -7,16 +7,21 @@ library(googleCloudStorageR)
 
 # Define UI
 ui <- fluidPage(
+  h2("Contents:"),
   # Button to Connect to Google Storage Bucket
   actionButton("connect_btn", "Connect"),
   # Output to display contents of Google Storage Bucket
   verbatimTextOutput("gs_output"),
+  h2("Download:"),
+  # Text box to capture a file name
+  textInput("file_name_download", "Enter the name of the file you'd like to download:"),
   # Button to download contents of Google Storage Bucket
   downloadButton("download_btn", "Download"),
   # File upload box
+  h3("Upload:"),
   fileInput("file_upload", "Upload file"),
   # Text box to capture a file name
-  textInput("file_name", "Enter file name:"),
+  textInput("file_name_upload", "Give your file a name:"),
   # Button to upload file to Google Storage Bucket
   actionButton("upload_btn", "Upload")
 )
@@ -33,9 +38,16 @@ server <- function(input, output) {
   
   # Action to take when Download button is clicked
   output$download_btn <- downloadHandler(
-    filename <- "input_data.xlsx",
-    content <- function(file) {
+    
+    filename = function(){
       
+      paste(input$file_name_download)
+      
+    }
+    
+    ,
+    content <- function(file) {
+
       # Method 1 - works
       
       # Retrieve the excel file and save it to a temp directory on the disc
@@ -55,7 +67,7 @@ server <- function(input, output) {
       # Method 2 - more concisely works!
       
       gcs_get_object(bucket = "re_optimise-486",
-                     object_name = "scenario_0/input_data.xlsx",
+                     object_name = input$file_name_download,
                      # 'file' is the path to a temp directory, so this will save the 
                      # data to disc here, and then the download handler will grab it from there and pass to the user
                      saveToDisk = file,
@@ -71,7 +83,7 @@ server <- function(input, output) {
     if (!is.null(uploaded_file)) {
       gcs_upload(file = uploaded_file$datapath, 
                  bucket = "re_optimise-486", 
-                 name = paste0(input$file_name, "_input_data.xlsx"))
+                 name = input$file_name_upload)
     }
   })
   
