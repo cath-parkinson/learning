@@ -23,7 +23,12 @@ ui <- fluidPage(
   # Text box to capture a file name
   textInput("file_name_upload", "Give your file a name:"),
   # Button to upload file to Google Storage Bucket
-  actionButton("upload_btn", "Upload")
+  actionButton("upload_btn", "Upload"),
+  h3("Delete:"),
+  # Text box to capture the name of the file you want to delete
+  textInput("file_name_delete", "Enter the name of the file you'd like to delete:"),
+  # Button to download contents of Google Storage Bucket
+  actionButton("delete_btn", "Delete"),
 )
 
 # Define Server
@@ -85,7 +90,25 @@ server <- function(input, output) {
                  bucket = "re_optimise-486", 
                  name = input$file_name_upload)
     }
+    
+    # Update the output to show the uploaded file
+    output$gs_output <- renderPrint({
+      gcs_list_objects("re_optimise-486")
+    })
   })
+  
+  
+  # Action to take when delete button is pressed
+  observeEvent(input$delete_btn, {
+    gcs_delete_object(bucket = "re_optimise-486", 
+                      object_name = input$file_name_delete)
+    
+    # Update the output to show the deleted file
+    output$gs_output <- renderPrint({
+      gcs_list_objects("re_optimise-486")
+    })
+  })
+  
   
 }
 

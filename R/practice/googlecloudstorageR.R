@@ -1,10 +1,11 @@
 # This works exactly fine when I make the service account an "owner"
 # And I follow these steps 
 # https://bookdown.org/hegghammer/interacting_with_google_storage_in_r/interacting_with_google_storage.html
-
 # And now it works if I set the roles as Storage Admin, Storage Object Admin, Storage Object Creator
-Sys.setenv("GCS_AUTH_FILE" = file.path(getwd(), "measuremonks-tools-5d83c9d4859b.json"))
+Sys.setenv("GCS_AUTH_FILE" = file.path(getwd(), "measuremonks-tools-cb5499f780b1.json"))
 
+
+# Docs https://cran.r-project.org/web/packages/googleCloudStorageR/vignettes/googleCloudStorageR.html
 library(googleCloudStorageR)
 
 # tell me all the buckets
@@ -31,3 +32,7 @@ gcs_get_object(object_name = "scenario_0/input_data.xlsx",
                saveToDisk = "input_data_downloaded.xlsx",
                overwrite = TRUE)
 
+
+# delete files
+gcs_delete_object(object_name = "dummy2_input_data.xlsx",
+                  bucket = "re_optimise-486")
