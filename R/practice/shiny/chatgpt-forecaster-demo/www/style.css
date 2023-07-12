@@ -1,0 +1,20 @@
+/* Action Buttons */
+.btn-default {
+  background-color: #7D26C9; /* vib_purple */
+  color: #FFFFFF; /* white */
+  border-color: #7D26C9; /* vib_purple */
+  font-weight: bold;
+}
+
+/* Sliders */
+input[type="range"]::-webkit-slider-thumb {
+  background-color: #A6A6A6; /* Gray */
+}
+
+input[type="range"]::-moz-range-thumb {
+  background-color: #A6A6A6; /* Gray */
+}
+
+input[type="range"]::-ms-thumb {
+  background-color: #A6A6A6; /* Gray */
+}
