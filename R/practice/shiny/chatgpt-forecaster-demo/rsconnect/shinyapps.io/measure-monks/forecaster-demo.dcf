@@ -1,0 +1,14 @@
+name: forecaster-demo
+title: forecaster-demo
+username:
+account: measure-monks
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 9457045
+bundleId: 7457355
+url: https://measure-monks.shinyapps.io/forecaster-demo/
+when: 1689349795.09876
+lastSyncTime: 1689349795.09876
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: archive/data_v0.xlsx|data worked.xlsx
