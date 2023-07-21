@@ -1,0 +1,25 @@
+.small-box {
+  height: 140px; 
+  width: 200px;
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
+  overflow-y: hidden;
+}
+
+.small-box p {
+  height: 60px; 
+  overflow-y: hidden;
+  text-overflow: ellipsis;
+}
+
+.tooltip-inner {
+  background-color: #001D38;
+  color:white;
+  font-weight: bold;
+  opacity: 1;
+}
+
+
+
+
+
