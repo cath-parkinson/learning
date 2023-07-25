@@ -6,9 +6,22 @@ library(dplyr)
 library(highcharter)
 library(tidyr)
 
+# Basic color theme for app -----------------------
+
+background <- "#001D38" # dark blue
+highlight2 <- "#4F24EE" # vib blue
+highlight4 <- "#7D26C9" # vib purble
+highlight3 <- "#00DC7C" # vib green
+highlight1 <- "#4DBAC1" # vib teal
+neutral1 <- "#CBF6FF" # pas blue
+
+
 # Highcharter theme -----------------------------
 
 mm_highcharter_theme <- hc_theme(
+  title = list(style = list(
+    color = neutral1
+  )),
   chart = list(
     backgroundColor = NULL, 
     style = list(
@@ -16,7 +29,8 @@ mm_highcharter_theme <- hc_theme(
     )),
     legend = list(
       itemStyle = list(
-        color = "#CBF6FF" # Make the legend text the right color
+        color = "#CBF6FF",# Make the legend text the right color
+        fontWeight = "normal" 
       )),
     dataLabels = list(style = list(color = "#CBF6FF")
   ),
@@ -40,7 +54,9 @@ mm_highcharter_theme <- hc_theme(
 data <- readxl::read_xlsx("data.xlsx")
 
 sales <- data %>% 
-  dplyr::filter(date > "2022-07-01") 
+  dplyr::filter(date > "2022-07-01") %>% 
+  dplyr::mutate(weight = NA) %>% 
+  dplyr::mutate(weighted_value = NA)
 
 # UI ------------------------
 
@@ -69,28 +85,13 @@ ui <- fluidPage(
   br(),
   
   fluidRow(
-    column(width = 6,
+    column(width = 4,
            uiOutput("driver_ui"),
+           br(),
+           uiOutput("run_ui")
     ),
     
-    column(width = 6,
-           fluidRow(
-             column(width = 6,
-                    shinyWidgets::actionBttn(inputId = "runButton", 
-                                             label = "RUN",
-                                             style = "pill",
-                                             color = "success",
-                                             size = "lg")
-             ),
-             column(width = 6,
-                    shinyWidgets::actionBttn(inputId = "resetButton", 
-                                             label = "RESET",
-                                             style = "pill",
-                                             color = "success",
-                                             size = "lg")
-             )
-           ),
-           br(),
+    column(width = 8,
            highchartOutput("chart", height = "300px")
     )
   )
@@ -110,17 +111,17 @@ server <- function(input, output) {
   
   # Initalise value - reactive values seems to be the most natural way to do this
   slider_vals <- reactiveValues()
-  slider_vals$label <- c("MEDIA", "SEASONALITY", "ECONOMY", "PROMOS", "PRICE", "COMPETITOR", "BASE")
+  slider_vals$label <- c("MEDIA", "PROMOS", "PRICE", "COMPETITOR","ECONOMY", "SEASONALITY")
   
   observe({
     
     slider_vals$df <- tibble::tibble(slider = slider_vals$label,
-                                     slider_value = rep(1,7))
+                                     slider_value = rep(1,6))
     
   })
   
   # Update the table when the user moves the slider
-  lapply(1:7, function(i){
+  lapply(1:6, function(i){
     
     observeEvent(input[[paste0("slider_", slider_vals$label[i])]], {
       
@@ -135,29 +136,42 @@ server <- function(input, output) {
     
   output$driver_ui <- renderUI({
     
-    sliders <- lapply(1:7, function(i) {
-      div(fluidRow(
-        align = "center",
+    sliders <- lapply(1:6, function(i) {
+
+      div(id = "bttn-slider-row",
+          # h4("Media drivers:"),
+          fixedRow(
+        # align = "center",
         column(width = 4,
-               shinyWidgets::actionBttn(paste0("button_", slider_vals$label[i]),
+               div(id = "bttn-row",
+                 shinyWidgets::actionBttn(paste0("button_", slider_vals$label[i]),
                                         label = slider_vals$label[i],
                                         style = "pill",
                                         color = "danger",
-                                        size = "lg")
+                                        size = "sm"))
+               # h4(slider_vals$label[i])
         ),
         column(width = 8,
-               shinyWidgets::noUiSliderInput(paste0("slider_", slider_vals$label[i]), "",
-                               min = 0,
-                               max = 2,
-                               value = 1,
-                               tooltips = FALSE, # it's harder to get to the value you need if this is set to FALSE
-                               update_on = c("end"),
-                               step = 0.1,
-                               color = "#A6A6A6",
-                               width = "100%")
+               # div(id = "slider-round",
+                   shinyWidgets::noUiSliderInput(paste0("slider_", slider_vals$label[i]), "",
+                                                 min = 0,
+                                                 max = 2,
+                                                 value = 1,
+                                                 # label = slider_vals$label[i],
+                                                 tooltips = FALSE, # it's harder to get to the value you need if this is set to FALSE
+                                                 update_on = c("end"),
+                                                 step = 0.1,
+                                                 color = "#A6A6A6",
+                                                 width = "100%"
+                                                 # ,
+                                                 # height = "100%"
+                                                 )
+               # )
         )
-      ),
-      br())
+      )
+      # ,
+      # br()
+      )
     })
     
     tagList(sliders)
@@ -168,7 +182,7 @@ server <- function(input, output) {
   observeEvent(input$resetButton, {
 
     # Sliders
-    lapply(1:7, function(i){
+    lapply(1:6, function(i){
       
       updateNoUiSliderInput(inputId = paste0("slider_", slider_vals$label[i]),
                             value = 1)
@@ -177,8 +191,9 @@ server <- function(input, output) {
     
     # Data
     sales_data$df <- sales_data$df %>%
-      dplyr::mutate(weight = 1) %>% 
-      dplyr::mutate(weighted_value = value*weight) 
+      # Set to NAs so the forecast line disappears from the chart
+      dplyr::mutate(weight = NA) %>% 
+      dplyr::mutate(weighted_value = NA) 
   })
   
   # Run data
@@ -186,10 +201,35 @@ server <- function(input, output) {
   observeEvent(input$runButton, {
     
     sales_data$df <- sales_data$df %>%
+      dplyr::mutate(weight = weight0,
+                    weighted_value = weighted_value0) %>% 
       dplyr::left_join(slider_vals$df, by = c("series_name" = "slider")) %>%
       dplyr::mutate(weight = dplyr::if_else(is.na(slider_value), weight, slider_value)) %>% 
+      # Force the first week of the forecast to be the same as the "actual"
+      dplyr::mutate(weight = dplyr::if_else(date == as.Date("2023-07-01"), 1, weight)) %>% 
       dplyr::mutate(weighted_value = value*weight) %>% 
-      dplyr::select(-slider_value)
+      dplyr::select(-slider_value) %>% 
+      # We don't want to show the forecast in the "actual" period
+      dplyr::mutate(weighted_value = replace(weighted_value, date < as.Date("2023-07-01"), NA))
+    
+  })
+  
+  # Run UI ----------------------------
+  
+  output$run_ui <- renderUI({
+    
+    fluidRow(column(width = 9,
+                    shinyWidgets::actionBttn(inputId = "runButton", 
+                                             label = "Calculate my scenario",
+                                             style = "pill",
+                                             color = "success",
+                                             size = "sm")),
+             column(width = 3,
+                    shinyWidgets::actionBttn(inputId = "resetButton", 
+                                             label = "Reset",
+                                             style = "pill",
+                                             color = "royal",
+                                             size = "sm")))
     
   })
   
@@ -199,6 +239,8 @@ server <- function(input, output) {
   output$chart <- renderHighchart({
     
     highcharter::highchart() %>%
+      highcharter::hc_title(text = "Expected Sales",
+                            align = "left") %>% 
       highcharter::hc_add_series(data = sales_data$df %>% 
                                    dplyr::group_by(model, date) %>% 
                                    dplyr::summarise(weighted_value0 = sum(weighted_value0)) %>%
@@ -207,21 +249,25 @@ server <- function(input, output) {
                                  name = "Benchmark",
                                  hcaes(x = month, 
                                        y = weighted_value0),
-                                 type = "line", 
+                                 zoneAxis = "x",
+                                 zones = list(list(value = datetime_to_timestamp(as.Date("2023-07-01")), 
+                                             dashStyle = "solid")),
+                                 type = "line",
                                  dashStyle = "dash",
-                                 color = "#4F24EE") %>% 
+                                 color = highlight1) %>% 
       highcharter::hc_add_series(data = sales_data$df %>% 
                                    dplyr::group_by(model, date) %>% 
                                    dplyr::summarise(weighted_value = sum(weighted_value)) %>%
                                    dplyr::mutate(month = datetime_to_timestamp(date)
                                    ),
-                                 name = "Forecast",
+                                 name = "My Scenario",
                                  hcaes(x = month, 
                                        y = weighted_value),
                                  type = "line", 
-                                 color = "#4F24EE") %>% 
+                                 dashStyle = "dash",
+                                 color = highlight2) %>% 
       highcharter::hc_xAxis(type = "datetime",
-                            style = list(color = "#4F24EE"),
+                            # style = list(color = "#4F24EE"),
                             plotLines = list(list(color = "#CBF6FF",
                                                   value = datetime_to_timestamp(as.Date("2023-07-01")),
                                                   dashStyle = "shortdash",
@@ -235,9 +281,6 @@ server <- function(input, output) {
       highcharter::hc_add_theme(mm_highcharter_theme)
     
   })
-  
-  
-  
   
   
 }

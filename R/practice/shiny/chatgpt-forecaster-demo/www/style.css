@@ -1,16 +1,40 @@
-/* Action Buttons */
-.bttn-success {
-  background-color: #4F24EE !important; /* vib_blue */
-  font-weight: bold !important;
-} 
-
-.bttn-danger {
-  background-color: #7D26C9 !important; /* vib_purple */
-  font-weight: bold !important;
-  width: 170px !important;
-}
-
+/* This is the formatting for the header */
 h2 {
   font-weight: bold !important;
   font-size: 4em;
 }
+
+
+/* Action Buttons */
+
+.bttn {
+  width: 100% !important;
+  height: 100% !important;
+  font-weight: bold !important;
+}
+
+.bttn-success {
+  background-color: #4F24EE !important; /* vib_blue */
+} 
+
+.bttn-danger {
+  background-color: #7D26C9 !important; /* vib_purple */
+}
+
+.bttn-royal {
+  background-color: #A6A6A6 !important; /* grey */
+  color: #001D38 !important; /*main blue */
+}
+
+
+/* This forces a padding to the div that contains the bttn in the bttn-slider pair, and therefore shifts it in line with the slider*/
+#bttn-row {
+  padding-top: 12px;
+}
+
+
+
+
+
+
+
