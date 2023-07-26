@@ -6,14 +6,24 @@ library(dplyr)
 library(highcharter)
 library(tidyr)
 
+# CSS options for the noUI slider ---------------------
+
+# https://refreshless.com/nouislider/examples/#section-hiding-tooltips
+
+
 # Basic color theme for app -----------------------
 
-background <- "#001D38" # dark blue
-highlight2 <- "#4F24EE" # vib blue
-highlight4 <- "#7D26C9" # vib purble
+background <- "#001D38" # grey
+# highlight2 <- "#4F24EE" # vib blue
+highlight2 <- "#000000" # black
+# highlight4 <- "#7D26C9" # vib purble
+highlight4 <- "#FF2CE4" # bright clarity pink
 highlight3 <- "#00DC7C" # vib green
-highlight1 <- "#4DBAC1" # vib teal
-neutral1 <- "#CBF6FF" # pas blue
+# highlight1 <- "#4DBAC1" # vib teal
+highlight1 <- "#7F7F7F" # darker grey
+# highlight1 <- "#001D38" # master blue
+# neutral1 <- "#CBF6FF" # pas blue
+neutral1 <- "#000000" # black
 
 
 # Highcharter theme -----------------------------
@@ -29,21 +39,21 @@ mm_highcharter_theme <- hc_theme(
     )),
     legend = list(
       itemStyle = list(
-        color = "#CBF6FF",# Make the legend text the right color
+        color = neutral1,# Make the legend text the right color
         fontWeight = "normal" 
       )),
-    dataLabels = list(style = list(color = "#CBF6FF")
+    dataLabels = list(style = list(color = neutral1)
   ),
   yAxis = list(
     gridLineWidth = 0,
     lineWidth = 1,
-    lineColor = "#CBF6FF",
-    labels = list(style = list(color = "#CBF6FF")),
+    lineColor = neutral1,
+    labels = list(style = list(color = neutral1)),
     ticks = list(display = TRUE)
   ),
   xAxis = list(
-    labels = list(style = list(color = "#CBF6FF")),
-    lineColor = "#CBF6FF",
+    labels = list(style = list(color = neutral1)),
+    lineColor = neutral1,
     minorTickLength = 0,
     tickLength = 0
   )
@@ -65,8 +75,8 @@ ui <- fluidPage(
     tags$style(HTML("
       body {
         font-family: Calibri;
-        background-color: #001D38;
-        color: #CBF6FF;
+        background-color: #EAE8E4;
+        color: #000000;
       }
     ")),
     tags$link(rel = "stylesheet", type = "text/css", href = "style.css")
@@ -111,17 +121,19 @@ server <- function(input, output) {
   
   # Initalise value - reactive values seems to be the most natural way to do this
   slider_vals <- reactiveValues()
-  slider_vals$label <- c("MEDIA", "PROMOS", "PRICE", "COMPETITOR","ECONOMY", "SEASONALITY")
+  # slider_vals$label <- c("MEDIA", "PROMOS", "PRICE", "COMPETITOR","ECONOMY", "SEASONALITY")
+  slider_vals$label <- c("AD-SPEND", "AD-CREATIVITY", "MEDIA-EFFECT", "PROMOS", "PRICE", "COMPETITOR","ECONOMY", "SEASONALITY")
+  slider_vals$color <- c("primary", "primary", "primary", "warning", "warning", "warning", "danger", "danger")
   
   observe({
     
     slider_vals$df <- tibble::tibble(slider = slider_vals$label,
-                                     slider_value = rep(1,6))
+                                     slider_value = rep(1,8))
     
   })
   
   # Update the table when the user moves the slider
-  lapply(1:6, function(i){
+  lapply(1:8, function(i){
     
     observeEvent(input[[paste0("slider_", slider_vals$label[i])]], {
       
@@ -136,7 +148,7 @@ server <- function(input, output) {
     
   output$driver_ui <- renderUI({
     
-    sliders <- lapply(1:6, function(i) {
+    sliders <- lapply(1:8, function(i) {
 
       div(id = "bttn-slider-row",
           # h4("Media drivers:"),
@@ -145,14 +157,14 @@ server <- function(input, output) {
         column(width = 4,
                div(id = "bttn-row",
                  shinyWidgets::actionBttn(paste0("button_", slider_vals$label[i]),
-                                        label = slider_vals$label[i],
+                                        label = gsub("-", " ", slider_vals$label[i]),
                                         style = "pill",
-                                        color = "danger",
+                                        color = slider_vals$color[i],
                                         size = "sm"))
                # h4(slider_vals$label[i])
         ),
         column(width = 8,
-               # div(id = "slider-round",
+               div(id = "slider-row",
                    shinyWidgets::noUiSliderInput(paste0("slider_", slider_vals$label[i]), "",
                                                  min = 0,
                                                  max = 2,
@@ -161,12 +173,12 @@ server <- function(input, output) {
                                                  tooltips = FALSE, # it's harder to get to the value you need if this is set to FALSE
                                                  update_on = c("end"),
                                                  step = 0.1,
-                                                 color = "#A6A6A6",
+                                                 color = "#7F7F7F",
                                                  width = "100%"
                                                  # ,
                                                  # height = "100%"
                                                  )
-               # )
+               )
         )
       )
       # ,
@@ -182,7 +194,7 @@ server <- function(input, output) {
   observeEvent(input$resetButton, {
 
     # Sliders
-    lapply(1:6, function(i){
+    lapply(1:8, function(i){
       
       updateNoUiSliderInput(inputId = paste0("slider_", slider_vals$label[i]),
                             value = 1)
@@ -268,7 +280,7 @@ server <- function(input, output) {
                                  color = highlight2) %>% 
       highcharter::hc_xAxis(type = "datetime",
                             # style = list(color = "#4F24EE"),
-                            plotLines = list(list(color = "#CBF6FF",
+                            plotLines = list(list(color = highlight1,
                                                   value = datetime_to_timestamp(as.Date("2023-07-01")),
                                                   dashStyle = "shortdash",
                                                   width = 3

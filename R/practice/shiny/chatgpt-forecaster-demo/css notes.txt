@@ -1,0 +1,29 @@
+
+div.noUi-target {
+    height: 10px;
+}
+
+
+.noUi-connect {
+    background: #c0392b !important;
+}
+
+.noUi-handle {
+    height: 18px !important;
+    width: 18px !important;
+    top: -5px !important;
+    right: -9px !important; /* half the width */
+   border-radius: 9px !important;
+}
+
+
+# this works!
+
+div.noUi-tooltip {
+    display: none !important; 
+  /*  background-color: #FF245B !important; /* vib_red */
+   /* color: #FF245B !important; /* vib_red */ 
+}
+div.noUi-active .noUi-tooltip {
+    display: block !important;
+}
