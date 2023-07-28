@@ -46,6 +46,10 @@ h2 {
   height: 53px !important;
 } 
 
+div {
+  margin-top: 0px !important; 
+}
+
 /* This by default hides the tool tip */
 div.noUi-tooltip {
     display: none !important;  

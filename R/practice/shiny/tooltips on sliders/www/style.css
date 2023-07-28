@@ -1,0 +1,26 @@
+
+.bttn {
+  width: 100% !important;
+  height: 100% !important;
+  font-weight: bold !important;
+}
+
+.bttn-success {
+  background-color: #000000 !important; /* black */
+} 
+
+/* When the tooltip is set to TRUE, a margin-top of 40px is automatically added to the div containing the slider, so we need to reset this back to 0px in order to not shift the slider down. It does not work without the important! */
+div {
+  margin-top: 0px !important; 
+}
+
+div.noUi-tooltip {
+    display: none !important; 
+  /*  background-color: #FF245B !important; /* vib_red */
+   /* color: #FF245B !important; /* vib_red */ 
+}
+div.noUi-active .noUi-tooltip {
+    display: block !important;
+    bottom: -2px !important;
+    left: 60px !important; 
+}

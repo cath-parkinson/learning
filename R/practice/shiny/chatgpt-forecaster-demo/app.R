@@ -173,7 +173,7 @@ server <- function(input, output) {
                                                  max = 2,
                                                  value = 1,
                                                  # label = slider_vals$label[i],
-                                                 tooltips = FALSE, # it's harder to get to the value you need if this is set to FALSE
+                                                 tooltips = TRUE, 
                                                  update_on = c("end"),
                                                  step = 0.1,
                                                  color = "#7F7F7F",
