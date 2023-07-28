@@ -85,7 +85,7 @@ ui <- fluidPage(
   titlePanel("FORECASTER"),
   
   # shinyWidgets::actionBttn(inputId = "debug",
-  #                          label = "DEBUG"),
+                           # label = "DEBUG"),
   
   fluidRow(
     column(width = 12,
@@ -102,9 +102,12 @@ ui <- fluidPage(
     ),
     
     column(width = 8,
-           highchartOutput("chart", height = "300px")
+           fluidRow(column(width = 4,
+                           highchartOutput("chart2", height = "300px")),
+                    column(width = 8,
+                           highchartOutput("chart", height = "300px"))))
+           
     )
-  )
 )
 
 server <- function(input, output) {
@@ -248,10 +251,38 @@ server <- function(input, output) {
   
   # Charts -------------------------
   
+  
+  output$chart2 <- renderHighchart({
+    
+    total_data <- sales_data$df %>%
+      dplyr::filter(date > "2023-07-01") %>% 
+      dplyr::summarise("Benchmark" = sum(weighted_value0),
+                       "My Scenario" = sum(weighted_value)) %>%
+                       # "My Scenario" = 705000) %>% 
+      tidyr::pivot_longer(cols = c("Benchmark", "My Scenario"),
+                          names_to = "series",
+                          values_to = "value")
+    
+    total_data %>%
+      highcharter::hchart(type = "bar", 
+                          # The group is essential for allowing us to use a different color for each bar
+               hcaes(x = "series", y = "value", group = "series"), color = c(highlight1, highlight2)) %>%
+      # Then this stacking = normal also formats the now colored series, groups correctly on the chart
+      highcharter::hc_plotOptions(series = list(stacking = "normal")) %>% 
+      highcharter::hc_add_theme(mm_highcharter_theme) %>% 
+      hc_yAxis(title = "") %>% 
+      hc_xAxis(title = "") %>% 
+      highcharter::hc_title(text = "Total Sales",
+                            align = "left") %>% 
+      hc_legend(enabled = T)
+    
+  })
+  
   output$chart <- renderHighchart({
     
+    
     highcharter::highchart() %>%
-      highcharter::hc_title(text = "Expected Sales",
+      highcharter::hc_title(text = "Weekly Sales",
                             align = "left") %>% 
       highcharter::hc_add_series(data = sales_data$df %>% 
                                    dplyr::group_by(model, date) %>% 
