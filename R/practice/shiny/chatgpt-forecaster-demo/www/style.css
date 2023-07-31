@@ -40,12 +40,7 @@ h2 {
   padding-top: 12px;
 }
 
-
-/* This doesn't work - when I add the tool tip it autosizes everything else! */
-#slider-row {
-  height: 53px !important;
-} 
-
+/* When the tooltip is set to TRUE, a margin-top of 40px is automatically added to the div containing the slider, so we need to reset this back to 0px in order to not shift the slider down. It does not work without the important! */
 div {
   margin-top: 0px !important; 
 }
