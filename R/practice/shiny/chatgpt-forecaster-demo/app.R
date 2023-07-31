@@ -125,7 +125,7 @@ server <- function(input, output) {
   # Initalise value - reactive values seems to be the most natural way to do this
   slider_vals <- reactiveValues()
   # slider_vals$label <- c("MEDIA", "PROMOS", "PRICE", "COMPETITOR","ECONOMY", "SEASONALITY")
-  slider_vals$label <- c("AD-SPEND", "AD-CREATIVITY", "MEDIA-EFFECT", "PROMOS", "PRICE", "COMPETITOR","ECONOMY", "SEASONALITY")
+  slider_vals$label <- c("AD-SPEND", "CREATIVE-SCORE", "MEDIA-MIX", "PROMOS", "PRICE", "COMPETITOR","ECONOMY", "SEASONALITY")
   slider_vals$color <- c("primary", "primary", "primary", "warning", "warning", "warning", "danger", "danger")
   
   observe({
@@ -268,7 +268,9 @@ server <- function(input, output) {
                           # The group is essential for allowing us to use a different color for each bar
                hcaes(x = "series", y = "value", group = "series"), color = c(highlight1, highlight2)) %>%
       # Then this stacking = normal also formats the now colored series, groups correctly on the chart
-      highcharter::hc_plotOptions(series = list(stacking = "normal")) %>% 
+      highcharter::hc_plotOptions(series = list(stacking = "normal"
+                                                # dataLabels = list(enabled = TRUE)
+                                                )) %>% 
       highcharter::hc_add_theme(mm_highcharter_theme) %>% 
       hc_yAxis(title = "") %>% 
       hc_xAxis(title = "") %>% 

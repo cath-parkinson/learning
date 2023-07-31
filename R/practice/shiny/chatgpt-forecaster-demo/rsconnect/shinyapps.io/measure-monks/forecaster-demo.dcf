@@ -5,10 +5,10 @@ account: measure-monks
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9457045
-bundleId: 7507063
+bundleId: 7515239
 url: https://measure-monks.shinyapps.io/forecaster-demo/
-when: 1690559349.92065
-lastSyncTime: 1690559349.92065
+when: 1690821721.71575
+lastSyncTime: 1690821721.71575
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: archive/data_v0.xlsx|css notes.txt|data worked.xlsx
