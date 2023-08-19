@@ -5,7 +5,10 @@ library(tidyverse)
 library(lubridate)
 
 # This does not work because Essence have not given me the required job role
-projectid = "essence-looker-exports-itv"
+# projectid = "essence-looker-exports-itv"
+# No - it didn't work because this would charge the fee to Essence's project - which is wrong!!!
+# This now works yay!!
+projectid = "measuremonks-tools"
 sql <- "SELECT * FROM `essence-looker-exports-itv.dbt_prod.__cross_channel__base_table` LIMIT 10"
 tb <- bq_project_query(projectid, sql)
 # Store the first 10 rows of the data in a tibble
