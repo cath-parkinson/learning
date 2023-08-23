@@ -36,11 +36,9 @@ ui <- dashboardPage(
   ),
   dashboardBody(
     tags$style(HTML("
-      /* Add your custom CSS styles here */
-      #sidebarItemExpanded {
-        height: 800px;
-      }
-    "))
+    .open > .dropdown-menu {
+      display: contents;
+      }"))
   )
 )
 # Define server logic
