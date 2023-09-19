@@ -1,0 +1,25 @@
+div {
+  padding-top: 10px;
+}
+
+#reset_filter {
+    padding-top: 50px;
+}
+
+/* Shiny Widget Action Buttons */
+.bttn-success {
+    background: #001D38 !important;
+    color: #CBF6FF !important;
+    margin: 5% auto !important;
+    width: 80%!important;
+}
+
+.bttn-primary {
+    background: #001D38 !important;
+    color: #CBF6FF !important;
+}
+
+.bttn-primary:focus {
+    background: #A6A6A6 !important;
+    color: #001D38 !important;
+}
