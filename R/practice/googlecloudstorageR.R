@@ -8,12 +8,12 @@ Sys.setenv("GCS_AUTH_FILE" = file.path(getwd(), "measuremonks-tools-cb5499f780b1
 # Docs https://cran.r-project.org/web/packages/googleCloudStorageR/vignettes/googleCloudStorageR.html
 library(googleCloudStorageR)
 
-# tell me all the buckets
+# tell me all the buckets - this should not work, because I updated the permissions on this service account so it has less universal access
 gcs_list_buckets("measuremonks-tools")
 
-# tell me about this bucket, and list all the objects in it
+# tell me about this bucket, and list all the objects in it - the first one should not work
 gcs_get_bucket("re_optimise-486")
-gcs_list_objects("re_optimise-486")
+gcs_list_objects("re_optimise-486") # this should work!
 
 # upload objects to it - note we're using the '/' to create a folder structure in the bucket
 gcs_upload(file = file.path(getwd(), "input_data.xlsx"),
