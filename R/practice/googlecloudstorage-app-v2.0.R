@@ -1,5 +1,5 @@
 # It's important to set the environment variables before we run the application
-Sys.setenv("GCS_AUTH_FILE" = file.path(getwd(), "measuremonks-tools-5d83c9d4859b.json"))
+Sys.setenv("GCS_AUTH_FILE" = file.path(getwd(), "measuremonks-tools-efc85504571d.json"))
 
 # Load required libraries
 library(shiny)
@@ -27,7 +27,7 @@ server <- function(input, output) {
   # Action to take when Connect button is clicked
   observeEvent(input$connect_btn, {
     output$gs_output <- renderPrint({
-      gcs_list_objects("re_optimise-486")
+      gcs_list_objects("re_optimise-test")
     })
   })
   
@@ -54,7 +54,7 @@ server <- function(input, output) {
       
       # Method 2 - more concisely works!
       
-      gcs_get_object(bucket = "re_optimise-486",
+      gcs_get_object(bucket = "re_optimise-test",
                      object_name = "scenario_0/input_data.xlsx",
                      # 'file' is the path to a temp directory, so this will save the 
                      # data to disc here, and then the download handler will grab it from there and pass to the user
@@ -70,7 +70,7 @@ server <- function(input, output) {
     uploaded_file <- input$file_upload # get uploaded file
     if (!is.null(uploaded_file)) {
       gcs_upload(file = uploaded_file$datapath, 
-                 bucket = "re_optimise-486", 
+                 bucket = "re_optimise-test", 
                  name = paste0(input$file_name, "_input_data.xlsx"))
     }
   })
